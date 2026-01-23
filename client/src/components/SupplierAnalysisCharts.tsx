@@ -41,6 +41,19 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
         inventory: Math.round(item.inventory / 1000000)
       }));
 
+    // Top 10 fornecedores por Ruptura
+    const topRuptureSuppliers = data
+      .map(row => ({
+        name: String(row.Fornecedor || '').substring(0, 12),
+        rupture: Number(row['% RUPTURA TOTAL']) || 0,
+      }))
+      .sort((a, b) => b.rupture - a.rupture)
+      .slice(0, 10)
+      .map(item => ({
+        ...item,
+        rupture: Number((item.rupture * 100).toFixed(2))
+      }));
+
     // Scatter plot: Ruptura vs Excesso
     const scatterData = data
       .filter(row => {
@@ -79,6 +92,7 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
 
     return {
       topSuppliers,
+      topRuptureSuppliers,
       scatterData,
       buyerChartData
     };
@@ -86,13 +100,13 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
 
   return (
     <div className="space-y-6">
-      {/* Top 10 Fornecedores */}
+      {/* Top 10 Fornecedores - Nível de Serviço (Linha de Tendência) */}
       <div className="card-metric">
         <h3 className="text-lg font-semibold mb-4 text-foreground">
           Top 10 Fornecedores por Nível de Serviço
         </h3>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={chartData.topSuppliers}>
+          <LineChart data={chartData.topSuppliers}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#6b7280" angle={-45} textAnchor="end" height={80} />
             <YAxis stroke="#6b7280" label={{ value: 'Nível de Serviço (%)', angle: -90, position: 'insideLeft' }} />
@@ -104,7 +118,30 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
               }}
               formatter={(value: any) => `${value}%`}
             />
-            <Bar dataKey="serviceLevel" fill="#10b981" radius={[8, 8, 0, 0]} />
+            <Line type="monotone" dataKey="serviceLevel" stroke="#10b981" strokeWidth={2} dot={{ fill: '#10b981', r: 5 }} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Top 10 Fornecedores - Ruptura (Barras Vermelhas) */}
+      <div className="card-metric">
+        <h3 className="text-lg font-semibold mb-4 text-foreground">
+          Top 10 Fornecedores por Ruptura (%)
+        </h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={chartData.topRuptureSuppliers}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis dataKey="name" stroke="#6b7280" angle={-45} textAnchor="end" height={80} />
+            <YAxis stroke="#6b7280" label={{ value: 'Ruptura (%)', angle: -90, position: 'insideLeft' }} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#fff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px'
+              }}
+              formatter={(value: any) => `${value}%`}
+            />
+            <Bar dataKey="rupture" fill="#ef4444" radius={[8, 8, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
