@@ -11,6 +11,7 @@ import ExportData from '@/components/ExportData';
 import Sheet4SupplierBuyer from '@/pages/Sheet4SupplierBuyer';
 import Sheet2SupplierAnalysis from '@/pages/Sheet2SupplierAnalysis';
 import Sheet3BuyerAnalysis from '@/pages/Sheet3BuyerAnalysis';
+import Sheet1ProductAnalysis from '@/pages/Sheet1ProductAnalysis';
 import { useExcelParser } from '@/hooks/useExcelParser';
 import { useMultiSheetExcel } from '@/hooks/useMultiSheetExcel';
 
@@ -177,6 +178,9 @@ export default function Home() {
             {/* Content based on mode and active tab */}
             {mode === 'multi' && multiSheetData ? (
               <>
+                {activeTab === 'ANALISE PRODUTO' && (
+                  <Sheet1ProductAnalysis />
+                )}
                 {activeTab === 'ANALISE FORNECEDOR' && (
                   <Sheet2SupplierAnalysis />
                 )}
