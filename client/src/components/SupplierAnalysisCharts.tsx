@@ -11,7 +11,8 @@ import {
   Legend,
   ResponsiveContainer,
   LineChart,
-  Line
+  Line,
+  Cell
 } from 'recharts';
 import { Sheet2Record } from '@/hooks/useSheet2Data';
 
@@ -35,8 +36,8 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
       .map(item => ({
         ...item,
         serviceLevel: Number((item.serviceLevel * 100).toFixed(1)),
-        rupture: Number(item.rupture.toFixed(2)),
-        excess: Number(item.excess.toFixed(2)),
+        rupture: Number((item.rupture * 100).toFixed(2)),
+        excess: Number((item.excess * 100).toFixed(2)),
         inventory: Math.round(item.inventory / 1000000)
       }));
 
@@ -48,9 +49,10 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
         return rupture >= 0 && excess >= 0;
       })
       .map(row => ({
-        rupture: Number((Number(row['% RUPTURA TOTAL']) || 0).toFixed(2)),
-        excess: Number((Number(row['% EXCESSO TOTAL']) || 0).toFixed(2)),
-        name: String(row.Fornecedor || '')
+        rupture: Number(((Number(row['% RUPTURA TOTAL']) || 0) * 100).toFixed(2)),
+        excess: Number(((Number(row['% EXCESSO TOTAL']) || 0) * 100).toFixed(2)),
+        name: String(row.Fornecedor || ''),
+        fill: (Number(row['% RUPTURA TOTAL']) || 0) > 0.1 ? '#ef4444' : '#f97316'
       }));
 
     // Distribuição por comprador
@@ -70,7 +72,8 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
       .map((item: any) => ({
         name: item.name,
         count: item.count,
-        avgServiceLevel: Number(((item.avgServiceLevel / item.count) * 100).toFixed(1))
+        avgServiceLevel: Number(((item.avgServiceLevel / item.count) * 100).toFixed(1)),
+        fill: ((item.avgServiceLevel / item.count) * 100) > 90 ? '#10b981' : ((item.avgServiceLevel / item.count) * 100) > 80 ? '#3b82f6' : '#f59e0b'
       }))
       .sort((a: any, b: any) => b.avgServiceLevel - a.avgServiceLevel);
 
@@ -125,7 +128,9 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
               cursor={{ strokeDasharray: '3 3' }}
               formatter={(value: any) => `${value}%`}
             />
-            <Scatter name="Fornecedores" data={chartData.scatterData} fill="#06b6d4" />
+            {chartData.scatterData.map((entry, index) => (
+              <Scatter key={`scatter-${index}`} name={entry.name} data={[entry]} fill={entry.fill} />
+            ))}
           </ScatterChart>
         </ResponsiveContainer>
       </div>
@@ -149,7 +154,11 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
               formatter={(value: any) => `${value}%`}
             />
             <Legend />
-            <Bar dataKey="avgServiceLevel" fill="#0891b2" radius={[8, 8, 0, 0]} name="Nível Médio" />
+            <Bar dataKey="avgServiceLevel" radius={[8, 8, 0, 0]} name="Nível Médio">
+              {chartData.buyerChartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.fill} />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>

@@ -68,7 +68,7 @@ export default function Sheet4SupplierBuyer() {
 
   // Dados com filtro de mês aplicado (local)
   const dataWithMonthFilter = useMemo(() => {
-    if (!selectedMonth) return dataWithPeriodFilter;
+    if (!selectedMonth || selectedMonth === 'Todos') return dataWithPeriodFilter;
 
     return dataWithPeriodFilter.map(row => ({
       ...row,
@@ -78,14 +78,14 @@ export default function Sheet4SupplierBuyer() {
 
   // Calcular KPIs
   const kpis = useMemo(() => {
-    const dataForKPI = selectedMonth ? dataWithMonthFilter : dataWithPeriodFilter;
+    const dataForKPI = selectedMonth && selectedMonth !== 'Todos' ? dataWithMonthFilter : dataWithPeriodFilter;
     const totalFornecedores = new Set(dataForKPI.map(r => r.FORNECEDOR)).size;
     const totalCompradores = new Set(dataForKPI.map(r => r['COMPRADOR 01/26'])).size;
     
     let totalValor = 0;
     let totalMargem = 0;
     
-    if (selectedMonth) {
+    if (selectedMonth && selectedMonth !== 'Todos') {
       totalValor = dataForKPI.reduce((sum, r) => sum + (r.monthValue || 0), 0);
       totalMargem = dataForKPI.reduce((sum, r) => sum + (r['PROJETO MARGEM'] || 0), 0);
     } else {
@@ -93,7 +93,7 @@ export default function Sheet4SupplierBuyer() {
       totalMargem = dataForKPI.reduce((sum, r) => sum + (r['PROJETO MARGEM'] || 0), 0);
     }
 
-    const label = selectedMonth ? `${selectedMonth}/2026` : `Período`;
+    const label = selectedMonth && selectedMonth !== 'Todos' ? `${selectedMonth}/2026` : `Período`;
     const avgMargem = dataForKPI.length > 0 ? (totalMargem / dataForKPI.length) * 100 : 0;
     
     return [
@@ -126,8 +126,8 @@ export default function Sheet4SupplierBuyer() {
 
   // Gráficos
   const chartData = useMemo(() => {
-    const dataForCharts = selectedMonth ? dataWithMonthFilter : dataWithPeriodFilter;
-    const valueKey = selectedMonth ? 'monthValue' : 'periodValue';
+    const dataForCharts = selectedMonth && selectedMonth !== 'Todos' ? dataWithMonthFilter : dataWithPeriodFilter;
+    const valueKey = selectedMonth && selectedMonth !== 'Todos' ? 'monthValue' : 'periodValue';
     
     // Top 10 Fornecedores
     const fornecedorMap = new Map<string, number>();
@@ -138,7 +138,11 @@ export default function Sheet4SupplierBuyer() {
     });
 
     const topFornecedores = Array.from(fornecedorMap.entries())
-      .map(([name, value]) => ({ name: name.substring(0, 20), value }))
+      .map(([name, value]) => ({ 
+        name: name.substring(0, 20), 
+        value,
+        fill: value > 50000000 ? '#06b6d4' : value > 30000000 ? '#0ea5e9' : '#3b82f6'
+      }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 10);
 
@@ -267,7 +271,11 @@ export default function Sheet4SupplierBuyer() {
                 }}
                 formatter={(value: any) => `R$ ${(value / 1000000).toFixed(2)}M`}
               />
-              <Bar dataKey="value" fill="#06b6d4" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                {chartData.topFornecedores.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
