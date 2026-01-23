@@ -23,6 +23,7 @@ export interface Sheet4CompleteRecord {
   NOV: number;
   DEZ: number;
   monthValue?: number; // Campo opcional para filtro de mês
+  periodValue?: number; // Campo opcional para filtro de período
 }
 
 interface UseSheet4CompleteDataReturn {

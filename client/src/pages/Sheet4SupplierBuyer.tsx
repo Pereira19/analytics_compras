@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import UpdateDataButton from '@/components/UpdateDataButton';
 import MonthFilterContainer from '@/components/MonthFilterContainer';
 import { useSheet4CompleteData, Sheet4CompleteRecord } from '@/hooks/useSheet4CompleteData';
+import { usePeriodFilter, getMonthsInPeriod } from '@/contexts/PeriodFilterContext';
 import {
   BarChart,
   Bar,
@@ -26,6 +27,7 @@ const COLORS = ['#06b6d4', '#0ea5e9', '#3b82f6', '#8b5cf6', '#ec4899'];
 
 export default function Sheet4SupplierBuyer() {
   const { data, isLoading, error, refreshData } = useSheet4CompleteData();
+  const { periodFilter } = usePeriodFilter();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
@@ -46,19 +48,37 @@ export default function Sheet4SupplierBuyer() {
     return filtered;
   }, [data, searchTerm]);
 
-  // Dados com filtro de mês aplicado
-  const dataWithMonthFilter = useMemo(() => {
-    if (!selectedMonth) return filteredRows;
+  // Dados com filtro de período aplicado (do contexto global)
+  const dataWithPeriodFilter = useMemo(() => {
+    const monthsInPeriod = getMonthsInPeriod(periodFilter);
+    
+    return filteredRows.map(row => {
+      let totalValue = 0;
+      monthsInPeriod.forEach(({ month }) => {
+        const monthKey = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'][month - 1];
+        totalValue += (row[monthKey as keyof Sheet4CompleteRecord] as number) || 0;
+      });
+      
+      return {
+        ...row,
+        periodValue: totalValue
+      };
+    });
+  }, [filteredRows, periodFilter]);
 
-    return filteredRows.map(row => ({
+  // Dados com filtro de mês aplicado (local)
+  const dataWithMonthFilter = useMemo(() => {
+    if (!selectedMonth) return dataWithPeriodFilter;
+
+    return dataWithPeriodFilter.map(row => ({
       ...row,
       monthValue: row[selectedMonth as keyof Sheet4CompleteRecord] as number || 0
     }));
-  }, [filteredRows, selectedMonth]);
+  }, [dataWithPeriodFilter, selectedMonth]);
 
   // Calcular KPIs
   const kpis = useMemo(() => {
-    const dataForKPI = selectedMonth ? dataWithMonthFilter : data;
+    const dataForKPI = selectedMonth ? dataWithMonthFilter : dataWithPeriodFilter;
     const totalFornecedores = new Set(dataForKPI.map(r => r.FORNECEDOR)).size;
     const totalCompradores = new Set(dataForKPI.map(r => r['COMPRADOR 01/26'])).size;
     
@@ -69,11 +89,11 @@ export default function Sheet4SupplierBuyer() {
       totalValor = dataForKPI.reduce((sum, r) => sum + (r.monthValue || 0), 0);
       totalMargem = dataForKPI.reduce((sum, r) => sum + (r['PROJETO MARGEM'] || 0), 0);
     } else {
-      totalValor = dataForKPI.reduce((sum, r) => sum + (r['PROJETO VALOR'] || 0), 0);
+      totalValor = dataForKPI.reduce((sum, r) => sum + (r.periodValue || 0), 0);
       totalMargem = dataForKPI.reduce((sum, r) => sum + (r['PROJETO MARGEM'] || 0), 0);
     }
 
-    const label = selectedMonth ? `${selectedMonth}/2026` : 'Total';
+    const label = selectedMonth ? `${selectedMonth}/2026` : `Período`;
     const avgMargem = dataForKPI.length > 0 ? (totalMargem / dataForKPI.length) * 100 : 0;
     
     return [
@@ -102,18 +122,18 @@ export default function Sheet4SupplierBuyer() {
         color: 'from-orange-500 to-red-500'
       }
     ];
-  }, [data, selectedMonth, dataWithMonthFilter]);
+  }, [data, periodFilter, selectedMonth, dataWithMonthFilter, dataWithPeriodFilter]);
 
   // Gráficos
   const chartData = useMemo(() => {
-    const dataForCharts = selectedMonth ? dataWithMonthFilter : data;
-    const valueKey = selectedMonth ? 'monthValue' : 'PROJETO VALOR';
+    const dataForCharts = selectedMonth ? dataWithMonthFilter : dataWithPeriodFilter;
+    const valueKey = selectedMonth ? 'monthValue' : 'periodValue';
     
     // Top 10 Fornecedores
     const fornecedorMap = new Map<string, number>();
     dataForCharts.forEach(row => {
       const key = row['FORNECEDOR RESUMIDO'] || row.FORNECEDOR;
-      const value = selectedMonth ? (row.monthValue || 0) : (row['PROJETO VALOR'] || 0);
+      const value = selectedMonth ? (row.monthValue || 0) : (row.periodValue || 0);
       fornecedorMap.set(key, (fornecedorMap.get(key) || 0) + value);
     });
 
@@ -126,7 +146,7 @@ export default function Sheet4SupplierBuyer() {
     const compradorMap = new Map<string, number>();
     dataForCharts.forEach(row => {
       const key = row['COMPRADOR 01/26'];
-      const value = selectedMonth ? (row.monthValue || 0) : (row['PROJETO VALOR'] || 0);
+      const value = selectedMonth ? (row.monthValue || 0) : (row.periodValue || 0);
       compradorMap.set(key, (compradorMap.get(key) || 0) + value);
     });
 
@@ -157,7 +177,7 @@ export default function Sheet4SupplierBuyer() {
     });
 
     return { topFornecedores, compradores, monthlyData };
-  }, [data, selectedMonth, dataWithMonthFilter]);
+  }, [data, periodFilter, selectedMonth, dataWithMonthFilter, dataWithPeriodFilter]);
 
   // Paginação
   const totalPages = Math.ceil(filteredRows.length / ROWS_PER_PAGE);
@@ -367,7 +387,7 @@ export default function Sheet4SupplierBuyer() {
                     {((row['PROJETO MARGEM'] || 0) * 100).toFixed(2)}%
                   </td>
                   <td className="px-4 py-3 text-foreground text-right font-semibold">
-                    {selectedMonth ? `R$ ${((row.monthValue || 0) / 1000000).toFixed(2)}M` : `R$ ${(row['PROJETO VALOR'] / 1000000).toFixed(2)}M`}
+                    {selectedMonth ? `R$ ${((row.monthValue || 0) / 1000000).toFixed(2)}M` : `R$ ${((row.periodValue || 0) / 1000000).toFixed(2)}M`}
                   </td>
                   <td className="px-4 py-3 text-foreground text-right text-xs">
                     R$ {(row.JAN / 1000000).toFixed(2)}M
