@@ -26,7 +26,7 @@ export function PeriodFilterProvider({ children }: { children: React.ReactNode }
     month: 1
   });
 
-  const [availableYears, setAvailableYears] = useState<number[]>([2023, 2024, 2025, 2026]);
+  const [availableYears, setAvailableYears] = useState<number[]>([2026]);
 
   return (
     <PeriodFilterContext.Provider value={{ periodFilter, setPeriodFilter, availableYears, setAvailableYears }}>

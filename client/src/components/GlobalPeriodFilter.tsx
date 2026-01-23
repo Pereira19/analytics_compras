@@ -83,19 +83,25 @@ export default function GlobalPeriodFilter() {
           </Button>
         </div>
 
-        {/* Ano */}
-        <Select value={String(periodFilter.year)} onValueChange={handleYearChange}>
-          <SelectTrigger className="w-32">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {availableYears.map(year => (
-              <SelectItem key={year} value={String(year)}>
-                {year}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {/* Ano - Desabilitado se apenas um ano disponível */}
+        {availableYears.length > 1 ? (
+          <Select value={String(periodFilter.year)} onValueChange={handleYearChange}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {availableYears.map(year => (
+                <SelectItem key={year} value={String(year)}>
+                  {year}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <div className="text-sm font-semibold text-foreground bg-white px-3 py-2 rounded-lg border border-cyan-200">
+            {availableYears[0]}
+          </div>
+        )}
 
         {/* Mês */}
         {periodFilter.type === 'month' && (
