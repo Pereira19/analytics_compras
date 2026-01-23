@@ -20,7 +20,14 @@ interface ProductAnalysisChartsProps {
   data: Sheet1Record[];
 }
 
-const COLORS = ['#10b981', '#f59e0b', '#ef4444'];
+const COLORS = ['#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6'];
+const CURVA_COLORS: Record<string, string> = {
+  'A': '#10b981',    // Verde
+  'B': '#f59e0b',    // Laranja
+  'C': '#ef4444',    // Vermelho
+  'AA': '#3b82f6',   // Azul
+  'AAA': '#8b5cf6'   // Roxo
+};
 
 export default function ProductAnalysisCharts({ data }: ProductAnalysisChartsProps) {
   const chartData = useMemo(() => {
@@ -59,20 +66,62 @@ export default function ProductAnalysisCharts({ data }: ProductAnalysisChartsPro
       .sort((a, b) => b.value - a.value)
       .slice(0, 10);
 
-    // Scatter: Estoque vs Giro
+    // Bubble Chart: Estoque vs Giro agregado por Curva ABC
+    const curvaAggregation = new Map<string, {
+      count: number;
+      totalEstoque: number;
+      totalGiro: number;
+      avgEstoque: number;
+      avgGiro: number;
+    }>();
+
+    data.forEach(row => {
+      const curva = String(row['CURVA ABC'] || 'N/A');
+      const estoque = Number(row['ESTOQUE DISPONÍVEL']) || 0;
+      const giro = Number(row['GIRO MÉDIO MENSAL']) || 0;
+
+      if (!curvaAggregation.has(curva)) {
+        curvaAggregation.set(curva, {
+          count: 0,
+          totalEstoque: 0,
+          totalGiro: 0,
+          avgEstoque: 0,
+          avgGiro: 0
+        });
+      }
+
+      const current = curvaAggregation.get(curva)!;
+      current.count += 1;
+      current.totalEstoque += estoque;
+      current.totalGiro += giro;
+    });
+
+    const bubbleData = Array.from(curvaAggregation.entries())
+      .map(([curva, stats]) => ({
+        curva,
+        count: stats.count,
+        avgEstoque: Math.round(stats.totalEstoque / stats.count),
+        avgGiro: Math.round(stats.totalGiro / stats.count),
+        fill: CURVA_COLORS[curva] || '#6b7280'
+      }))
+      .sort((a, b) => b.count - a.count);
+
+    // Scatter: Estoque vs Giro (limitado para performance, com cores por curva)
     const scatterData = data
       .filter(row => Number(row['ESTOQUE DISPONÍVEL']) > 0 || Number(row['GIRO MÉDIO MENSAL']) > 0)
-      .slice(0, 500) // Limitar para performance
+      .slice(0, 300) // Reduzido para melhor performance
       .map(row => ({
         estoque: Number(row['ESTOQUE DISPONÍVEL']) || 0,
         giro: Number(row['GIRO MÉDIO MENSAL']) || 0,
-        curva: String(row['CURVA ABC'] || 'N/A')
+        curva: String(row['CURVA ABC'] || 'N/A'),
+        fill: CURVA_COLORS[String(row['CURVA ABC'] || 'N/A')] || '#6b7280'
       }));
 
     return {
       curvaData,
       topFornecedores,
       topCompradores,
+      bubbleData,
       scatterData
     };
   }, [data]);
@@ -149,11 +198,73 @@ export default function ProductAnalysisCharts({ data }: ProductAnalysisChartsPro
         </ResponsiveContainer>
       </div>
 
-      {/* Scatter: Estoque vs Giro */}
+      {/* Bubble Chart: Estoque vs Giro agregado por Curva ABC */}
       <div className="card-metric">
         <h3 className="text-lg font-semibold mb-4 text-foreground">
-          Análise Estoque vs Giro Médio Mensal
+          Análise Estoque vs Giro Médio Mensal (Agregado por Curva ABC)
         </h3>
+        <p className="text-sm text-muted-foreground mb-4">
+          Tamanho das bolhas = quantidade de produtos | Posição = estoque médio vs giro médio
+        </p>
+        <ResponsiveContainer width="100%" height={350}>
+          <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis 
+              type="number" 
+              dataKey="avgEstoque" 
+              name="Estoque Médio" 
+              stroke="#6b7280"
+              label={{ value: 'Estoque Médio', position: 'insideBottomRight', offset: -5 }}
+            />
+            <YAxis 
+              type="number" 
+              dataKey="avgGiro" 
+              name="Giro Médio" 
+              stroke="#6b7280"
+              label={{ value: 'Giro Médio', angle: -90, position: 'insideLeft' }}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#fff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px'
+              }}
+              cursor={{ strokeDasharray: '3 3' }}
+              formatter={(value: any) => {
+                if (typeof value === 'number') {
+                  return value.toLocaleString('pt-BR');
+                }
+                return value;
+              }}
+              labelFormatter={(label: any) => {
+                if (typeof label === 'object' && label !== null) {
+                  return `Curva: ${label.curva || 'N/A'}`;
+                }
+                return label;
+              }}
+            />
+            <Legend />
+            {chartData.bubbleData.map((entry, index) => (
+              <Scatter
+                key={`bubble-${index}`}
+                name={`Curva ${entry.curva} (${entry.count} produtos)`}
+                data={[entry]}
+                fill={entry.fill}
+                shape="circle"
+              />
+            ))}
+          </ScatterChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Scatter: Estoque vs Giro (todos os produtos com cores por curva) */}
+      <div className="card-metric">
+        <h3 className="text-lg font-semibold mb-4 text-foreground">
+          Detalhamento: Estoque vs Giro Médio Mensal (Primeiros 300 Produtos)
+        </h3>
+        <p className="text-sm text-muted-foreground mb-4">
+          Cores indicam a Curva ABC de cada produto
+        </p>
         <ResponsiveContainer width="100%" height={350}>
           <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -167,7 +278,16 @@ export default function ProductAnalysisCharts({ data }: ProductAnalysisChartsPro
               }}
               cursor={{ strokeDasharray: '3 3' }}
             />
-            <Scatter name="Produtos" data={chartData.scatterData} fill="#f59e0b" />
+            <Legend />
+            {/* Agrupar por curva para legend */}
+            {['A', 'B', 'C', 'AA', 'AAA'].map((curva) => (
+              <Scatter
+                key={`scatter-${curva}`}
+                name={`Curva ${curva}`}
+                data={chartData.scatterData.filter(d => d.curva === curva)}
+                fill={CURVA_COLORS[curva] || '#6b7280'}
+              />
+            ))}
           </ScatterChart>
         </ResponsiveContainer>
       </div>
