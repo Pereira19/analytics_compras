@@ -10,6 +10,7 @@ import DataFilters from '@/components/DataFilters';
 import ExportData from '@/components/ExportData';
 import Sheet4SupplierBuyer from '@/pages/Sheet4SupplierBuyer';
 import Sheet2SupplierAnalysis from '@/pages/Sheet2SupplierAnalysis';
+import Sheet3BuyerAnalysis from '@/pages/Sheet3BuyerAnalysis';
 import { useExcelParser } from '@/hooks/useExcelParser';
 import { useMultiSheetExcel } from '@/hooks/useMultiSheetExcel';
 
@@ -178,6 +179,9 @@ export default function Home() {
               <>
                 {activeTab === 'ANALISE FORNECEDOR' && (
                   <Sheet2SupplierAnalysis />
+                )}
+                {activeTab === 'ANALISE COMPRADOR' && (
+                  <Sheet3BuyerAnalysis />
                 )}
                 {activeTab === 'FORNECEDORES X COMPRADOR' && (
                   <Sheet4SupplierBuyer />
