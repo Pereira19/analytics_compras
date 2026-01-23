@@ -1,15 +1,17 @@
 import { useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import SupplierAnalysisKPIs from '@/components/SupplierAnalysisKPIs';
 import SupplierAnalysisCharts from '@/components/SupplierAnalysisCharts';
 import { useSheet2Data, Sheet2Record } from '@/hooks/useSheet2Data';
+import { usePeriodFilter } from '@/contexts/PeriodFilterContext';
 
 const ROWS_PER_PAGE = 15;
 
 export default function Sheet2SupplierAnalysis() {
   const { data, isLoading, error } = useSheet2Data();
+  const { periodFilter } = usePeriodFilter();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -54,6 +56,12 @@ export default function Sheet2SupplierAnalysis() {
     );
   }
 
+  const periodLabel = periodFilter.type === 'month' 
+    ? `${periodFilter.month}/${periodFilter.year}`
+    : periodFilter.type === 'quarter'
+    ? `Q${periodFilter.quarter}/${periodFilter.year}`
+    : `S${periodFilter.semester}/${periodFilter.year}`;
+
   const headers = ['COD', 'Fornecedor', 'COMPRADOR', 'NIVEL SERVIÇO RUPTURA S/ PENDÊNCIA', '% RUPTURA TOTAL', '% EXCESSO TOTAL', 'VALOR ESTOQUE PREÇO VENDA'];
 
   return (
@@ -66,6 +74,15 @@ export default function Sheet2SupplierAnalysis() {
         <p className="text-muted-foreground">
           Métricas de nível de serviço, ruptura e excesso de estoque por fornecedor
         </p>
+      </div>
+
+      {/* Informação de Período */}
+      <div className="card-metric bg-blue-50 border border-blue-200 flex items-start gap-3">
+        <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+        <div>
+          <p className="text-sm font-semibold text-blue-900">Período Selecionado: {periodLabel}</p>
+          <p className="text-xs text-blue-700 mt-1">Os dados desta aba são agregados. Quando dados mensais forem disponibilizados nas colunas FATURAMENTO/ENTRADA, o filtro será aplicado automaticamente.</p>
+        </div>
       </div>
 
       {/* KPIs */}

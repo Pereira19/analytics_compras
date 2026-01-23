@@ -12,6 +12,7 @@ import Sheet4SupplierBuyer from '@/pages/Sheet4SupplierBuyer';
 import Sheet2SupplierAnalysis from '@/pages/Sheet2SupplierAnalysis';
 import Sheet3BuyerAnalysis from '@/pages/Sheet3BuyerAnalysis';
 import Sheet1ProductAnalysis from '@/pages/Sheet1ProductAnalysis';
+import GlobalPeriodFilter from '@/components/GlobalPeriodFilter';
 import { useExcelParser } from '@/hooks/useExcelParser';
 import { useMultiSheetExcel } from '@/hooks/useMultiSheetExcel';
 
@@ -173,6 +174,11 @@ export default function Home() {
                   </button>
                 ))}
               </div>
+            )}
+
+            {/* Filtro Global de Período */}
+            {mode === 'multi' && multiSheetData && (
+              <GlobalPeriodFilter />
             )}
 
             {/* Content based on mode and active tab */}
