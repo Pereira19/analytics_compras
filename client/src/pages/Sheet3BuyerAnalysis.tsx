@@ -1,17 +1,63 @@
-import { useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { useMemo, useState, useContext } from 'react';
+import { ChevronLeft, ChevronRight, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import BuyerAnalysisKPIs from '@/components/BuyerAnalysisKPIs';
 import BuyerAnalysisCharts from '@/components/BuyerAnalysisCharts';
-import { useSheet3Data, Sheet3Record } from '@/hooks/useSheet3Data';
+import ExportPDFButton from '@/components/ExportPDFButton';
+import { usePeriodFilter, getPeriodLabel } from '@/contexts/PeriodFilterContext';
+
+interface BuyerRecord {
+  COD: number;
+  COMPRADOR: string;
+  NIVEL_SERVICO_S_PENDENCIA: number | null;
+  NIVEL_SERVICO_C_PENDENCIA: number | null;
+  RUPTURA_TOTAL: number;
+  EXCESSO_TOTAL: number;
+  VALOR_ESTOQUE_VENDA: number;
+  SKU_INDUSTRIA: number;
+  SKU_ATIVOS: number;
+  PMP: number | null;
+  PRAZO_CLIENTE: number | null;
+  VALOR_VENDA_ATUAL: number;
+  VALOR_VENDA_PROJETADA: number;
+  PROJETO: number;
+  PROJETO_PERCENTUAL: number;
+  LUCRO_PROJETO: number;
+  LUCRO_REALIZADO: number;
+  LUCRO_PERCENTUAL: number;
+}
 
 const ROWS_PER_PAGE = 15;
 
 export default function Sheet3BuyerAnalysis() {
-  const { data, isLoading, error } = useSheet3Data();
+  const [data, setData] = useState<BuyerRecord[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const { periodFilter } = usePeriodFilter();
+
+  // Carregar dados
+  useMemo(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('/sheet3_data_complete.json');
+        if (!response.ok) throw new Error('Erro ao carregar dados');
+        const jsonData = await response.json();
+        setData(jsonData);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erro desconhecido');
+        setData([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const filteredRows = useMemo(() => {
     if (!searchTerm) return data;
@@ -54,7 +100,53 @@ export default function Sheet3BuyerAnalysis() {
     );
   }
 
-  const headers = ['COMPRADOR', 'NIVEL SERVIÇO RUPTURA S/ PENDÊNCIA', '% RUPTURA TOTAL', '% EXCESSO TOTAL', 'VALOR ESTOQUE PREÇO VENDA', 'SKU INDUSTRIA ATIVOS'];
+  const periodLabel = getPeriodLabel(periodFilter);
+
+  const headers = [
+    'COD',
+    'COMPRADOR',
+    'SKU INDUSTRIA',
+    'ATIVOS',
+    'PMP',
+    'PRAZO CLIENTE',
+    'VALOR VENDA ATUAL',
+    'VALOR VENDA PROJETADA',
+    'LUCRO REALIZADO',
+    '% LUCRO'
+  ];
+
+  // Gerar conteúdo HTML para exportação
+  const generateTableHTML = () => {
+    let html = '<table><thead><tr>';
+    headers.forEach(h => {
+      html += `<th>${h}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+    
+    currentRows.forEach(row => {
+      html += '<tr>';
+      headers.forEach(header => {
+        let value = '';
+        
+        if (header === 'COD') value = String(row.COD);
+        else if (header === 'COMPRADOR') value = row.COMPRADOR;
+        else if (header === 'SKU INDUSTRIA') value = String(row.SKU_INDUSTRIA || '-');
+        else if (header === 'ATIVOS') value = String(row.SKU_ATIVOS || '-');
+        else if (header === 'PMP') value = row.PMP ? `R$ ${(row.PMP / 1000000).toFixed(2)}M` : '-';
+        else if (header === 'PRAZO CLIENTE') value = row.PRAZO_CLIENTE ? `${row.PRAZO_CLIENTE} dias` : '-';
+        else if (header === 'VALOR VENDA ATUAL') value = `R$ ${(row.VALOR_VENDA_ATUAL / 1000000).toFixed(2)}M`;
+        else if (header === 'VALOR VENDA PROJETADA') value = `R$ ${(row.VALOR_VENDA_PROJETADA / 1000000).toFixed(2)}M`;
+        else if (header === 'LUCRO REALIZADO') value = `R$ ${(row.LUCRO_REALIZADO / 1000000).toFixed(2)}M`;
+        else if (header === '% LUCRO') value = `${(row.LUCRO_PERCENTUAL * 100).toFixed(2)}%`;
+        
+        html += `<td>${value}</td>`;
+      });
+      html += '</tr>';
+    });
+    
+    html += '</tbody></table>';
+    return html;
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -64,32 +156,48 @@ export default function Sheet3BuyerAnalysis() {
           Análise de Compradores
         </h2>
         <p className="text-muted-foreground">
-          Métricas de desempenho, nível de serviço e gestão de estoque por comprador
+          Métricas de desempenho, vendas e lucro por comprador
         </p>
       </div>
 
+      {/* Informação de Período */}
+      <div className="card-metric bg-blue-50 border border-blue-200 flex items-start gap-3">
+        <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+        <div>
+          <p className="text-sm font-semibold text-blue-900">Período Selecionado: {periodLabel}</p>
+          <p className="text-xs text-blue-700 mt-1">Os dados desta aba incluem métricas de vendas, lucro e desempenho por comprador.</p>
+        </div>
+      </div>
+
       {/* KPIs */}
-      <BuyerAnalysisKPIs data={data} />
+      <BuyerAnalysisKPIs data={data as any} />
 
       {/* Gráficos */}
-      <BuyerAnalysisCharts data={data} />
+      <BuyerAnalysisCharts data={data as any} />
 
       {/* Tabela Detalhada */}
       <div className="card-metric">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 gap-4">
           <h3 className="text-lg font-semibold text-foreground">
-            Dados Detalhados
+            Dados Detalhados ({filteredRows.length})
           </h3>
-          <Input
-            type="text"
-            placeholder="Buscar..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="w-64"
-          />
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="Buscar..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-64"
+            />
+            <ExportPDFButton
+              title={`Análise de Compradores - ${periodLabel}`}
+              fileName={`analise_compradores_${periodLabel.replace(/\//g, '-')}`}
+              content={generateTableHTML()}
+            />
+          </div>
         </div>
 
         <div className="overflow-x-auto">
@@ -112,27 +220,28 @@ export default function Sheet3BuyerAnalysis() {
                   key={rowIndex}
                   className="border-b border-border hover:bg-secondary/20 transition-colors"
                 >
-                  {headers.map((header) => {
-                    const value = row[header as keyof Sheet3Record];
-                    let displayValue = String(value ?? '-');
-
-                    if (typeof value === 'number') {
-                      if (header.includes('VALOR') || header.includes('PREÇO')) {
-                        displayValue = `R$ ${(value / 1000000).toFixed(2)}M`;
-                      } else if (header.includes('%') || header.includes('RUPTURA') || header.includes('EXCESSO') || header.includes('SERVIÇO')) {
-                        displayValue = `${(value * 100).toFixed(2)}%`;
-                      }
-                    }
-
-                    return (
-                      <td
-                        key={`${rowIndex}-${header}`}
-                        className="px-4 py-3 text-foreground"
-                      >
-                        {displayValue}
-                      </td>
-                    );
-                  })}
+                  <td className="px-4 py-3 text-foreground">{row.COD}</td>
+                  <td className="px-4 py-3 text-foreground font-medium">{row.COMPRADOR}</td>
+                  <td className="px-4 py-3 text-foreground">{row.SKU_INDUSTRIA || '-'}</td>
+                  <td className="px-4 py-3 text-foreground">{row.SKU_ATIVOS || '-'}</td>
+                  <td className="px-4 py-3 text-foreground">
+                    {row.PMP ? `R$ ${(row.PMP / 1000000).toFixed(2)}M` : '-'}
+                  </td>
+                  <td className="px-4 py-3 text-foreground">
+                    {row.PRAZO_CLIENTE ? `${row.PRAZO_CLIENTE} dias` : '-'}
+                  </td>
+                  <td className="px-4 py-3 text-foreground">
+                    R$ {(row.VALOR_VENDA_ATUAL / 1000000).toFixed(2)}M
+                  </td>
+                  <td className="px-4 py-3 text-foreground">
+                    R$ {(row.VALOR_VENDA_PROJETADA / 1000000).toFixed(2)}M
+                  </td>
+                  <td className="px-4 py-3 text-foreground">
+                    R$ {(row.LUCRO_REALIZADO / 1000000).toFixed(2)}M
+                  </td>
+                  <td className="px-4 py-3 text-foreground font-semibold">
+                    {(row.LUCRO_PERCENTUAL * 100).toFixed(2)}%
+                  </td>
                 </tr>
               ))}
             </tbody>
