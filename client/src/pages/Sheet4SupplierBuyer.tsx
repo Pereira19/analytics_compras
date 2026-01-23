@@ -46,13 +46,36 @@ export default function Sheet4SupplierBuyer() {
     return filtered;
   }, [data, searchTerm]);
 
+  // Dados com filtro de mês aplicado
+  const dataWithMonthFilter = useMemo(() => {
+    if (!selectedMonth) return filteredRows;
+
+    return filteredRows.map(row => ({
+      ...row,
+      monthValue: row[selectedMonth as keyof Sheet4CompleteRecord] as number || 0
+    }));
+  }, [filteredRows, selectedMonth]);
+
   // Calcular KPIs
   const kpis = useMemo(() => {
-    const totalFornecedores = new Set(data.map(r => r.FORNECEDOR)).size;
-    const totalCompradores = new Set(data.map(r => r['COMPRADOR 01/26'])).size;
-    const totalValor = data.reduce((sum, r) => sum + (r['PROJETO VALOR'] || 0), 0);
-    const totalMargem = data.reduce((sum, r) => sum + (r['PROJETO MARGEM'] || 0), 0);
+    const dataForKPI = selectedMonth ? dataWithMonthFilter : data;
+    const totalFornecedores = new Set(dataForKPI.map(r => r.FORNECEDOR)).size;
+    const totalCompradores = new Set(dataForKPI.map(r => r['COMPRADOR 01/26'])).size;
+    
+    let totalValor = 0;
+    let totalMargem = 0;
+    
+    if (selectedMonth) {
+      totalValor = dataForKPI.reduce((sum, r) => sum + (r.monthValue || 0), 0);
+      totalMargem = dataForKPI.reduce((sum, r) => sum + (r['PROJETO MARGEM'] || 0), 0);
+    } else {
+      totalValor = dataForKPI.reduce((sum, r) => sum + (r['PROJETO VALOR'] || 0), 0);
+      totalMargem = dataForKPI.reduce((sum, r) => sum + (r['PROJETO MARGEM'] || 0), 0);
+    }
 
+    const label = selectedMonth ? `${selectedMonth}/2026` : 'Total';
+    const avgMargem = dataForKPI.length > 0 ? (totalMargem / dataForKPI.length) * 100 : 0;
+    
     return [
       {
         label: 'Total de Fornecedores',
@@ -67,27 +90,31 @@ export default function Sheet4SupplierBuyer() {
         color: 'from-green-500 to-emerald-500'
       },
       {
-        label: 'Valor Projeto Total',
+        label: `Valor ${label}`,
         value: `R$ ${(totalValor / 1000000).toFixed(2)}M`,
         icon: DollarSign,
         color: 'from-purple-500 to-pink-500'
       },
       {
         label: 'Margem Média',
-        value: `${((totalMargem / data.length) * 100).toFixed(2)}%`,
+        value: `${avgMargem.toFixed(2)}%`,
         icon: TrendingUp,
         color: 'from-orange-500 to-red-500'
       }
     ];
-  }, [data]);
+  }, [data, selectedMonth, dataWithMonthFilter]);
 
   // Gráficos
   const chartData = useMemo(() => {
+    const dataForCharts = selectedMonth ? dataWithMonthFilter : data;
+    const valueKey = selectedMonth ? 'monthValue' : 'PROJETO VALOR';
+    
     // Top 10 Fornecedores
     const fornecedorMap = new Map<string, number>();
-    data.forEach(row => {
+    dataForCharts.forEach(row => {
       const key = row['FORNECEDOR RESUMIDO'] || row.FORNECEDOR;
-      fornecedorMap.set(key, (fornecedorMap.get(key) || 0) + (row['PROJETO VALOR'] || 0));
+      const value = selectedMonth ? (row.monthValue || 0) : (row['PROJETO VALOR'] || 0);
+      fornecedorMap.set(key, (fornecedorMap.get(key) || 0) + value);
     });
 
     const topFornecedores = Array.from(fornecedorMap.entries())
@@ -97,9 +124,10 @@ export default function Sheet4SupplierBuyer() {
 
     // Distribuição por Comprador
     const compradorMap = new Map<string, number>();
-    data.forEach(row => {
+    dataForCharts.forEach(row => {
       const key = row['COMPRADOR 01/26'];
-      compradorMap.set(key, (compradorMap.get(key) || 0) + (row['PROJETO VALOR'] || 0));
+      const value = selectedMonth ? (row.monthValue || 0) : (row['PROJETO VALOR'] || 0);
+      compradorMap.set(key, (compradorMap.get(key) || 0) + value);
     });
 
     const compradores = Array.from(compradorMap.entries())
@@ -122,14 +150,14 @@ export default function Sheet4SupplierBuyer() {
       { month: 'DEZ', value: 0 }
     ];
 
-    data.forEach(row => {
+    dataForCharts.forEach(row => {
       monthlyData.forEach(m => {
         m.value += (row[m.month as keyof Sheet4CompleteRecord] as number) || 0;
       });
     });
 
     return { topFornecedores, compradores, monthlyData };
-  }, [data]);
+  }, [data, selectedMonth, dataWithMonthFilter]);
 
   // Paginação
   const totalPages = Math.ceil(filteredRows.length / ROWS_PER_PAGE);
@@ -339,7 +367,7 @@ export default function Sheet4SupplierBuyer() {
                     {((row['PROJETO MARGEM'] || 0) * 100).toFixed(2)}%
                   </td>
                   <td className="px-4 py-3 text-foreground text-right font-semibold">
-                    R$ {(row['PROJETO VALOR'] / 1000000).toFixed(2)}M
+                    {selectedMonth ? `R$ ${((row.monthValue || 0) / 1000000).toFixed(2)}M` : `R$ ${(row['PROJETO VALOR'] / 1000000).toFixed(2)}M`}
                   </td>
                   <td className="px-4 py-3 text-foreground text-right text-xs">
                     R$ {(row.JAN / 1000000).toFixed(2)}M
