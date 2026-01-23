@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, Grid3x3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FileUpload from '@/components/FileUpload';
 import DataStats from '@/components/DataStats';
@@ -8,7 +8,9 @@ import AnalyticsCharts from '@/components/AnalyticsCharts';
 import AdvancedStats from '@/components/AdvancedStats';
 import DataFilters from '@/components/DataFilters';
 import ExportData from '@/components/ExportData';
+import Sheet4SupplierBuyer from '@/pages/Sheet4SupplierBuyer';
 import { useExcelParser } from '@/hooks/useExcelParser';
+import { useMultiSheetExcel } from '@/hooks/useMultiSheetExcel';
 
 /**
  * Design Philosophy: Modernismo Minimalista
@@ -19,28 +21,52 @@ import { useExcelParser } from '@/hooks/useExcelParser';
  * - Animações suaves e transições fluidas
  */
 export default function Home() {
-  const { data, error, isLoading, parseExcel, clearData } = useExcelParser();
+  const { data: singleSheetData, error: singleError, isLoading: singleLoading, parseExcel: parseSingle, clearData: clearSingle } = useExcelParser();
+  const { data: multiSheetData, error: multiError, isLoading: multiLoading, parseExcel: parseMulti, clearData: clearMulti } = useMultiSheetExcel();
+  
   const [showSuccess, setShowSuccess] = useState(false);
-  const [filteredData, setFilteredData] = useState<typeof data>(null);
+  const [filteredData, setFilteredData] = useState<typeof singleSheetData>(null);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [mode, setMode] = useState<'single' | 'multi'>('single');
 
   const handleFileSelect = async (file: File) => {
     setShowSuccess(false);
-    const result = await parseExcel(file);
-    if (result) {
+    setActiveTab(null);
+    
+    // Tentar carregar múltiplas abas primeiro
+    const multiResult = await parseMulti(file);
+    if (multiResult) {
+      setMode('multi');
+      setActiveTab('sheet4');
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
+    } else {
+      // Fallback para single sheet
+      const singleResult = await parseSingle(file);
+      if (singleResult) {
+        setMode('single');
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+      }
     }
   };
 
   const handleReset = () => {
-    clearData();
+    clearSingle();
+    clearMulti();
     setFilteredData(null);
+    setActiveTab(null);
     setShowSuccess(false);
+    setMode('single');
   };
 
   const handleFilterChange = (newData: any) => {
     setFilteredData(newData);
   };
+
+  const isLoading = singleLoading || multiLoading;
+  const error = singleError || multiError;
+  const hasData = singleSheetData || multiSheetData;
 
   return (
     <div className="min-h-screen gradient-hero">
@@ -61,7 +87,7 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            {data && (
+            {hasData && (
               <Button
                 onClick={handleReset}
                 variant="outline"
@@ -78,7 +104,7 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="container py-12">
-        {!data ? (
+        {!hasData ? (
           // Upload Section
           <div className="max-w-2xl mx-auto">
             <div className="mb-8">
@@ -105,8 +131,8 @@ export default function Home() {
                   description: 'Excel (.xlsx, .xls) e CSV'
                 },
                 {
-                  title: 'Processamento Rápido',
-                  description: 'Análise instantânea de seus dados'
+                  title: 'Múltiplas Abas',
+                  description: 'Processa automaticamente todas as abas'
                 },
                 {
                   title: 'Gráficos Interativos',
@@ -126,44 +152,73 @@ export default function Home() {
           </div>
         ) : (
           // Dashboard Section
-          <div className="space-y-8 animate-in fade-in duration-500">
-            {/* Title */}
-            <div>
-              <h2 className="text-3xl font-bold text-foreground mb-2">
-                Análise de Dados
-              </h2>
-              <p className="text-muted-foreground">
-                Visualize e explore seus dados com gráficos interativos
-              </p>
-            </div>
+          <div className="space-y-8">
+            {/* Tabs Navigation */}
+            {mode === 'multi' && multiSheetData && (
+              <div className="flex gap-2 flex-wrap bg-white rounded-lg p-4 shadow-sm border border-border">
+                {multiSheetData.sheetNames.map((sheetName, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveTab(sheetName)}
+                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                      activeTab === sheetName
+                        ? 'bg-accent text-white shadow-md'
+                        : 'bg-secondary text-foreground hover:bg-secondary/80'
+                    }`}
+                  >
+                    {sheetName}
+                  </button>
+                ))}
+              </div>
+            )}
 
-            {/* Stats Cards */}
-            <DataStats data={data} />
+            {/* Content based on mode and active tab */}
+            {mode === 'multi' && multiSheetData ? (
+              <>
+                {activeTab === 'FORNECEDORES X COMPRADOR' && (
+                  <Sheet4SupplierBuyer />
+                )}
+                {!activeTab && (
+                  <div className="text-center py-12">
+                    <Grid3x3 className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground">
+                      Selecione uma aba acima para visualizar os dados
+                    </p>
+                  </div>
+                )}
+              </>
+            ) : (
+              // Single sheet mode
+              <>
+                {/* Stats Cards */}
+                <DataStats data={singleSheetData!} />
 
-            {/* Advanced Statistics */}
-            <AdvancedStats data={data} />
+                {/* Advanced Statistics */}
+                <AdvancedStats data={singleSheetData!} />
 
-            {/* Filters */}
-            <DataFilters data={data} onFilterChange={handleFilterChange} />
+                {/* Filters */}
+                <DataFilters data={singleSheetData!} onFilterChange={handleFilterChange} />
 
-            {/* Charts */}
-            <div>
-              <h3 className="text-2xl font-semibold text-foreground mb-6">
-                Visualizações
-              </h3>
-              <AnalyticsCharts data={filteredData || data} />
-            </div>
+                {/* Charts */}
+                <div>
+                  <h3 className="text-2xl font-semibold text-foreground mb-6">
+                    Visualizações
+                  </h3>
+                  <AnalyticsCharts data={filteredData || singleSheetData!} />
+                </div>
 
-            {/* Export */}
-            <ExportData data={filteredData || data} />
+                {/* Export */}
+                <ExportData data={filteredData || singleSheetData!} />
 
-            {/* Data Table */}
-            <div>
-              <h3 className="text-2xl font-semibold text-foreground mb-6">
-                Dados Detalhados
-              </h3>
-              <DataTable data={filteredData || data} />
-            </div>
+                {/* Data Table */}
+                <div>
+                  <h3 className="text-2xl font-semibold text-foreground mb-6">
+                    Dados Detalhados
+                  </h3>
+                  <DataTable data={filteredData || singleSheetData!} />
+                </div>
+              </>
+            )}
           </div>
         )}
       </main>
