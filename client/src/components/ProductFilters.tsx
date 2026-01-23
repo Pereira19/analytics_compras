@@ -46,12 +46,12 @@ export default function ProductFilters({
         <label className="text-sm font-medium text-foreground mb-2 block">
           Fornecedor
         </label>
-        <Select value={selectedFornecedor || ''} onValueChange={(val) => onFornecedorChange(val || null)}>
+        <Select value={selectedFornecedor || 'all'} onValueChange={(val) => onFornecedorChange(val === 'all' ? null : val)}>
           <SelectTrigger>
             <SelectValue placeholder="Todos os fornecedores" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todos os fornecedores</SelectItem>
+            <SelectItem value="all">Todos os fornecedores</SelectItem>
             {fornecedores.map((fornecedor) => (
               <SelectItem key={fornecedor} value={fornecedor}>
                 {fornecedor}
@@ -66,12 +66,12 @@ export default function ProductFilters({
         <label className="text-sm font-medium text-foreground mb-2 block">
           Comprador
         </label>
-        <Select value={selectedComprador || ''} onValueChange={(val) => onCompradorChange(val || null)}>
+        <Select value={selectedComprador || 'all'} onValueChange={(val) => onCompradorChange(val === 'all' ? null : val)}>
           <SelectTrigger>
             <SelectValue placeholder="Todos os compradores" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todos os compradores</SelectItem>
+            <SelectItem value="all">Todos os compradores</SelectItem>
             {compradores.map((comprador) => (
               <SelectItem key={comprador} value={comprador}>
                 {comprador}
@@ -86,12 +86,12 @@ export default function ProductFilters({
         <label className="text-sm font-medium text-foreground mb-2 block">
           Curva ABC
         </label>
-        <Select value={selectedCurva || ''} onValueChange={(val) => onCurvaChange(val || null)}>
+        <Select value={selectedCurva || 'all'} onValueChange={(val) => onCurvaChange(val === 'all' ? null : val)}>
           <SelectTrigger>
             <SelectValue placeholder="Todas as curvas" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todas as curvas</SelectItem>
+            <SelectItem value="all">Todas as curvas</SelectItem>
             {curvas.map((curva) => (
               <SelectItem key={curva} value={curva}>
                 {curva}
