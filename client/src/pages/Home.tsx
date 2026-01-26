@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { RotateCcw, Grid3x3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import ExecutiveDashboard from '@/pages/ExecutiveDashboard';
 import Sheet4SupplierBuyer from '@/pages/Sheet4SupplierBuyer';
 import Sheet2SupplierAnalysis from '@/pages/Sheet2SupplierAnalysis';
 import Sheet3BuyerAnalysis from '@/pages/Sheet3BuyerAnalysis';
@@ -16,9 +17,10 @@ import GlobalPeriodFilter from '@/components/GlobalPeriodFilter';
  * - Animações suaves e transições fluidas
  */
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<string>('FORNECEDORES X COMPRADOR');
+  const [activeTab, setActiveTab] = useState<string>('DASHBOARD EXECUTIVO');
 
   const tabs = [
+    { id: 'DASHBOARD EXECUTIVO', label: '📊 Dashboard Executivo', component: ExecutiveDashboard },
     { id: 'FORNECEDORES X COMPRADOR', label: 'Fornecedor × Comprador', component: Sheet4SupplierBuyer },
     { id: 'ANALISE FORNECEDOR', label: 'Análise Fornecedor', component: Sheet2SupplierAnalysis },
     { id: 'ANALISE COMPRADOR', label: 'Análise Comprador', component: Sheet3BuyerAnalysis },
@@ -71,8 +73,8 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Filtro Global de Período */}
-          <GlobalPeriodFilter />
+          {/* Filtro Global de Período - Não mostrar no Dashboard Executivo */}
+          {activeTab !== 'DASHBOARD EXECUTIVO' && <GlobalPeriodFilter />}
 
           {/* Content */}
           {ActiveComponent && (
