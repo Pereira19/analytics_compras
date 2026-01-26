@@ -8,17 +8,24 @@ interface BuyerAnalysisKPIsProps {
 
 export default function BuyerAnalysisKPIs({ data }: BuyerAnalysisKPIsProps) {
   const kpis = useMemo(() => {
+    // Filtrar apenas compradores reais (excluir TOTAL e DESCONTINUADO)
+    const activeData = data.filter(row => {
+      const comprador = String(row.COMPRADOR || '').toUpperCase();
+      return comprador !== 'TOTAL' && comprador !== 'DESCONTINUADO';
+    });
+
     let avgServiceLevel = 0;
     let avgRupturePercent = 0;
     let avgExcessPercent = 0;
     let totalInventoryValue = 0;
 
-    // Calcular totais para todos os registros
-    data.forEach((row: Sheet3Record) => {
-      const serviceLevel = Number(row['NIVEL SERVIÇO RUPTURA S/ PENDÊNCIA']) || 0;
-      const rupturePercent = Number(row['% RUPTURA TOTAL']) || 0;
-      const excessPercent = Number(row['% EXCESSO TOTAL']) || 0;
-      const inventoryValue = Number(row['VALOR ESTOQUE PREÇO VENDA']) || 0;
+    // Calcular totais apenas para compradores ativos
+    activeData.forEach((row: Sheet3Record) => {
+      // Usar os nomes corretos dos campos do sheet3_data_complete.json
+      const serviceLevel = Number(row['NIVEL_SERVICO_S_PENDENCIA'] || row['NIVEL SERVIÇO RUPTURA S/ PENDÊNCIA']) || 0;
+      const rupturePercent = Number(row['RUPTURA_TOTAL'] || row['% RUPTURA TOTAL']) || 0;
+      const excessPercent = Number(row['EXCESSO_TOTAL'] || row['% EXCESSO TOTAL']) || 0;
+      const inventoryValue = Number(row['VALOR_ESTOQUE_VENDA'] || row['VALOR ESTOQUE PREÇO VENDA']) || 0;
 
       avgServiceLevel += serviceLevel;
       avgRupturePercent += rupturePercent;
@@ -26,7 +33,7 @@ export default function BuyerAnalysisKPIs({ data }: BuyerAnalysisKPIsProps) {
       totalInventoryValue += inventoryValue;
     });
 
-    const count = data.length || 1;
+    const count = activeData.length || 1;
     // Valores já vêm em escala 0-1, multiplicar por 100 para percentual
     avgServiceLevel = (avgServiceLevel / count) * 100;
     avgRupturePercent = (avgRupturePercent / count) * 100;
