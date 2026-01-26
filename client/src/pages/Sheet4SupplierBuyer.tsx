@@ -79,8 +79,8 @@ export default function Sheet4SupplierBuyer() {
   // Calcular KPIs
   const kpis = useMemo(() => {
     const dataForKPI = selectedMonth && selectedMonth !== 'Todos' ? dataWithMonthFilter : dataWithPeriodFilter;
-    const totalFornecedores = new Set(dataForKPI.map(r => r.FORNECEDOR)).size;
-    const totalCompradores = new Set(dataForKPI.map(r => r['COMPRADOR 01/26'])).size;
+    const totalFornecedores = new Set(dataForKPI.map(r => r['FORNECEDOR RESUMIDO'] || r.FORNECEDOR)).size;
+    const totalCompradores = new Set(dataForKPI.map(r => r['COMPRADOR RESUMIDO'] || r['COMPRADOR 01/26'])).size;
     
     let totalValor = 0;
     let totalMargem = 0;
@@ -149,7 +149,7 @@ export default function Sheet4SupplierBuyer() {
     // Distribuição por Comprador
     const compradorMap = new Map<string, number>();
     dataForCharts.forEach(row => {
-      const key = row['COMPRADOR 01/26'];
+      const key = row['COMPRADOR RESUMIDO'] || row['COMPRADOR 01/26'];
       const value = selectedMonth ? (row.monthValue || 0) : (row.periodValue || 0);
       compradorMap.set(key, (compradorMap.get(key) || 0) + value);
     });
