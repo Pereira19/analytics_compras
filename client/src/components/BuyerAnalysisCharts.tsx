@@ -24,47 +24,51 @@ interface BuyerAnalysisChartsProps {
 
 export default function BuyerAnalysisCharts({ data }: BuyerAnalysisChartsProps) {
   const chartData = useMemo(() => {
+    // Filtrar apenas compradores reais (excluir TOTAL e DESCONTINUADO)
+    const activeData = data.filter(row => {
+      const comprador = String(row.COMPRADOR || '').toUpperCase();
+      return comprador !== 'TOTAL' && comprador !== 'DESCONTINUADO';
+    });
+
     // Dados por comprador
-    const buyerMetrics = data
-      .filter(row => row.COMPRADOR && row.COMPRADOR !== 'COMPRADOR')
+    const buyerMetrics = activeData
       .map(row => {
-        const serviceLevel = Number((Number(row['NIVEL SERVIÇO RUPTURA S/ PENDÊNCIA']) || 0) * 100);
-        const rupture = Number(row['% RUPTURA TOTAL']) || 0;
-        const excess = Number(row['% EXCESSO TOTAL']) || 0;
-        const inventory = Number(row['VALOR ESTOQUE PREÇO VENDA']) || 0;
+        // Usar nomes corretos dos campos do sheet3_data_complete.json
+        const serviceLevel = Number((Number(row['NIVEL_SERVICO_S_PENDENCIA'] || row['NIVEL SERVIÇO RUPTURA S/ PENDÊNCIA']) || 0) * 100);
+        const rupture = Number(row['RUPTURA_TOTAL'] || row['% RUPTURA TOTAL']) || 0;
+        const excess = Number(row['EXCESSO_TOTAL'] || row['% EXCESSO TOTAL']) || 0;
+        const inventory = Number(row['VALOR_ESTOQUE_VENDA'] || row['VALOR ESTOQUE PREÇO VENDA']) || 0;
         return {
           name: String(row.COMPRADOR || '').substring(0, 12),
           serviceLevel: Number(serviceLevel.toFixed(1)),
-          rupture: Number(rupture.toFixed(2)),
-          excess: Number(excess.toFixed(2)),
+          rupture: Number((rupture * 100).toFixed(2)),
+          excess: Number((excess * 100).toFixed(2)),
           inventory: Math.round(inventory / 1000000),
-          skuAtivos: Number(row['SKU INDUSTRIA ATIVOS']) || 0
+          skuAtivos: Number(row['SKU_ATIVOS'] || row['SKU INDUSTRIA ATIVOS']) || 0
         };
       })
       .sort((a, b) => Number(b.serviceLevel) - Number(a.serviceLevel));
 
     // Radar chart data
-    const radarData = data
-      .filter(row => row.COMPRADOR && row.COMPRADOR !== 'COMPRADOR')
+    const radarData = activeData
       .map(row => {
-        const serviceLevel = Number((Number(row['NIVEL SERVIÇO RUPTURA S/ PENDÊNCIA']) || 0) * 100);
-        const rupture = 100 - Number((Number(row['% RUPTURA TOTAL']) || 0) * 100);
-        const excess = 100 - Number((Number(row['% EXCESSO TOTAL']) || 0) * 100);
+        const serviceLevel = Number((Number(row['NIVEL_SERVICO_S_PENDENCIA'] || row['NIVEL SERVIÇO RUPTURA S/ PENDÊNCIA']) || 0) * 100);
+        const rupture = 100 - Number((Number(row['RUPTURA_TOTAL'] || row['% RUPTURA TOTAL']) || 0) * 100);
+        const excess = 100 - Number((Number(row['EXCESSO_TOTAL'] || row['% EXCESSO TOTAL']) || 0) * 100);
         return {
           name: String(row.COMPRADOR || '').substring(0, 8),
           'Nível Serviço': Number(serviceLevel.toFixed(1)),
           'Ruptura': Number(rupture.toFixed(1)),
           'Excesso': Number(excess.toFixed(1)),
-          'SKU Ativos': Math.min(100, (Number(row['SKU INDUSTRIA ATIVOS']) || 0) / 10)
+          'SKU Ativos': Math.min(100, (Number(row['SKU_ATIVOS'] || row['SKU INDUSTRIA ATIVOS']) || 0) / 10)
         };
       });
 
     // Comparação de valores
-    const valueComparison = data
-      .filter(row => row.COMPRADOR && row.COMPRADOR !== 'COMPRADOR')
+    const valueComparison = activeData
       .map(row => {
-        const custoValue = Number(row['VALOR ESTOQUE PREÇO CUSTO']) || 0;
-        const vendaValue = Number(row['VALOR ESTOQUE PREÇO VENDA']) || 0;
+        const custoValue = Number(row['VALOR_ESTOQUE_CUSTO'] || row['VALOR ESTOQUE PREÇO CUSTO']) || 0;
+        const vendaValue = Number(row['VALOR_ESTOQUE_VENDA'] || row['VALOR ESTOQUE PREÇO VENDA']) || 0;
         return {
           name: String(row.COMPRADOR || '').substring(0, 12),
           custo: Math.round(custoValue / 1000000),
