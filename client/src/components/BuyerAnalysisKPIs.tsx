@@ -12,27 +12,25 @@ export default function BuyerAnalysisKPIs({ data }: BuyerAnalysisKPIsProps) {
     let avgRupturePercent = 0;
     let avgExcessPercent = 0;
     let totalInventoryValue = 0;
-    let validCount = 0;
 
+    // Calcular totais para todos os registros
     data.forEach((row: Sheet3Record) => {
       const serviceLevel = Number(row['NIVEL SERVIÇO RUPTURA S/ PENDÊNCIA']) || 0;
       const rupturePercent = Number(row['% RUPTURA TOTAL']) || 0;
       const excessPercent = Number(row['% EXCESSO TOTAL']) || 0;
       const inventoryValue = Number(row['VALOR ESTOQUE PREÇO VENDA']) || 0;
 
-      if (serviceLevel > 0 || rupturePercent > 0 || excessPercent > 0 || inventoryValue > 0) {
-        avgServiceLevel += serviceLevel;
-        avgRupturePercent += rupturePercent;
-        avgExcessPercent += excessPercent;
-        totalInventoryValue += inventoryValue;
-        validCount++;
-      }
+      avgServiceLevel += serviceLevel;
+      avgRupturePercent += rupturePercent;
+      avgExcessPercent += excessPercent;
+      totalInventoryValue += inventoryValue;
     });
 
-    const count = validCount || 1;
+    const count = data.length || 1;
+    // Valores já vêm em escala 0-1, multiplicar por 100 para percentual
     avgServiceLevel = (avgServiceLevel / count) * 100;
-    avgRupturePercent = avgRupturePercent / count;
-    avgExcessPercent = avgExcessPercent / count;
+    avgRupturePercent = (avgRupturePercent / count) * 100;
+    avgExcessPercent = (avgExcessPercent / count) * 100;
 
     return [
       {
