@@ -22,7 +22,7 @@ interface SupplierAnalysisChartsProps {
 
 export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsProps) {
   const chartData = useMemo(() => {
-    // Top 10 fornecedores por Nível de Serviço
+    // Top 30 fornecedores por Nível de Serviço (para melhor representação)
     const topSuppliers = data
       .map(row => ({
         name: String(row.Fornecedor || '').substring(0, 12),
@@ -32,7 +32,7 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
         inventory: Number(row['VALOR ESTOQUE PREÇO VENDA']) || 0
       }))
       .sort((a, b) => b.serviceLevel - a.serviceLevel)
-      .slice(0, 10)
+      .slice(0, 30)
       .map(item => ({
         ...item,
         serviceLevel: Number((item.serviceLevel * 100).toFixed(1)),
@@ -54,19 +54,32 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
         rupture: Number((item.rupture * 100).toFixed(2))
       }));
 
-    // Scatter plot: Ruptura vs Excesso
-    const scatterData = data
+    // Bubble Chart: Ruptura vs Excesso com tamanho proporcional ao estoque
+    const bubbleData = data
       .filter(row => {
         const rupture = Number(row['% RUPTURA TOTAL']) || 0;
         const excess = Number(row['% EXCESSO TOTAL']) || 0;
-        return rupture >= 0 && excess >= 0;
+        const inventory = Number(row['VALOR ESTOQUE PREÇO VENDA']) || 0;
+        return rupture >= 0 && excess >= 0 && inventory > 0;
       })
-      .map(row => ({
-        rupture: Number(((Number(row['% RUPTURA TOTAL']) || 0) * 100).toFixed(2)),
-        excess: Number(((Number(row['% EXCESSO TOTAL']) || 0) * 100).toFixed(2)),
-        name: String(row.Fornecedor || ''),
-        fill: (Number(row['% RUPTURA TOTAL']) || 0) > 0.1 ? '#ef4444' : '#f97316'
-      }));
+      .map(row => {
+        const rupture = Number(row['% RUPTURA TOTAL']) || 0;
+        const excess = Number(row['% EXCESSO TOTAL']) || 0;
+        const inventory = Number(row['VALOR ESTOQUE PREÇO VENDA']) || 0;
+        
+        // Determinar cor baseada em risco
+        let fill = '#10b981'; // Verde - baixo risco
+        if (rupture > 0.1 || excess > 0.3) fill = '#f59e0b'; // Amarelo - médio risco
+        if (rupture > 0.2 || excess > 0.5) fill = '#ef4444'; // Vermelho - alto risco
+        
+        return {
+          rupture: Number((rupture * 100).toFixed(2)),
+          excess: Number((excess * 100).toFixed(2)),
+          inventory: Math.round(inventory / 1000000),
+          name: String(row.Fornecedor || ''),
+          fill: fill
+        };
+      });
 
     // Distribuição por comprador
     const buyerDistribution: Record<string, any> = {};
@@ -93,19 +106,20 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
     return {
       topSuppliers,
       topRuptureSuppliers,
-      scatterData,
+      bubbleData,
       buyerChartData
     };
   }, [data]);
 
   return (
     <div className="space-y-6">
-      {/* Top 10 Fornecedores - Nível de Serviço (Linha de Tendência) */}
+      {/* Top 30 Fornecedores - Nível de Serviço (Linha de Tendência) */}
       <div className="card-metric">
         <h3 className="text-lg font-semibold mb-4 text-foreground">
-          Top 10 Fornecedores por Nível de Serviço
+          Top 30 Fornecedores por Nível de Serviço
         </h3>
-        <ResponsiveContainer width="100%" height={300}>
+        <p className="text-xs text-muted-foreground mb-3">Mostrando distribuição completa de desempenho</p>
+        <ResponsiveContainer width="100%" height={350}>
           <LineChart data={chartData.topSuppliers}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#6b7280" angle={-45} textAnchor="end" height={80} />
@@ -118,7 +132,7 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
               }}
               formatter={(value: any) => `${value}%`}
             />
-            <Line type="monotone" dataKey="serviceLevel" stroke="#10b981" strokeWidth={2} dot={{ fill: '#10b981', r: 5 }} />
+            <Line type="monotone" dataKey="serviceLevel" stroke="#10b981" strokeWidth={2} dot={{ fill: '#10b981', r: 4 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -146,16 +160,17 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
         </ResponsiveContainer>
       </div>
 
-      {/* Ruptura vs Excesso */}
+      {/* Scatter Chart: Ruptura vs Excesso */}
       <div className="card-metric">
         <h3 className="text-lg font-semibold mb-4 text-foreground">
-          Análise: Ruptura vs Excesso
+          Análise: Ruptura vs Excesso (Scatter Plot)
         </h3>
-        <ResponsiveContainer width="100%" height={300}>
+        <p className="text-xs text-muted-foreground mb-3">Tamanho do ponto = Valor de Estoque | Cor = Nível de Risco (Verde=Baixo, Amarelo=Médio, Vermelho=Alto)</p>
+        <ResponsiveContainer width="100%" height={350}>
           <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="rupture" name="Ruptura (%)" stroke="#6b7280" />
-            <YAxis dataKey="excess" name="Excesso (%)" stroke="#6b7280" />
+            <XAxis dataKey="rupture" name="Ruptura (%)" stroke="#6b7280" label={{ value: 'Ruptura (%)', position: 'insideBottomRight', offset: -5 }} />
+            <YAxis dataKey="excess" name="Excesso (%)" stroke="#6b7280" label={{ value: 'Excesso (%)', angle: -90, position: 'insideLeft' }} />
             <Tooltip
               contentStyle={{
                 backgroundColor: '#fff',
@@ -163,9 +178,14 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
                 borderRadius: '8px'
               }}
               cursor={{ strokeDasharray: '3 3' }}
-              formatter={(value: any) => `${value}%`}
+              formatter={(value: any, name: string) => {
+                if (name === 'Ruptura (%)') return `${value}%`;
+                if (name === 'Excesso (%)') return `${value}%`;
+                if (name === 'Estoque (M)') return `R$ ${value}M`;
+                return value;
+              }}
             />
-            {chartData.scatterData.map((entry, index) => (
+            {chartData.bubbleData.map((entry, index) => (
               <Scatter key={`scatter-${index}`} name={entry.name} data={[entry]} fill={entry.fill} />
             ))}
           </ScatterChart>
