@@ -7,6 +7,7 @@ import Sheet2SupplierAnalysis from '@/pages/Sheet2SupplierAnalysis';
 import Sheet3BuyerAnalysis from '@/pages/Sheet3BuyerAnalysis';
 import Sheet1ProductAnalysis from '@/pages/Sheet1ProductAnalysis';
 import GlobalPeriodFilter from '@/components/GlobalPeriodFilter';
+import MonthFilter from '@/components/MonthFilter';
 
 /**
  * Design Philosophy: Modernismo Minimalista
@@ -18,6 +19,7 @@ import GlobalPeriodFilter from '@/components/GlobalPeriodFilter';
  */
 export default function Home() {
   const [activeTab, setActiveTab] = useState<string>('DASHBOARD EXECUTIVO');
+  const [selectedMonth, setSelectedMonth] = useState<string | null>('Todos');
 
   const tabs = [
     { id: 'DASHBOARD EXECUTIVO', label: '📊 Dashboard Executivo', component: ExecutiveDashboard },
@@ -72,6 +74,9 @@ export default function Home() {
               </button>
             ))}
           </div>
+
+          {/* Filtro de Mês */}
+          <MonthFilter selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} />
 
           {/* Filtro Global de Período - Não mostrar no Dashboard Executivo */}
           {activeTab !== 'DASHBOARD EXECUTIVO' && <GlobalPeriodFilter />}
