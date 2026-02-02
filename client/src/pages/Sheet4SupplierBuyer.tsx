@@ -25,12 +25,16 @@ import {
 const ROWS_PER_PAGE = 15;
 const COLORS = ['#06b6d4', '#0ea5e9', '#3b82f6', '#8b5cf6', '#ec4899'];
 
-export default function Sheet4SupplierBuyer() {
+interface Sheet4SupplierBuyerProps {
+  selectedMonth?: string | null;
+}
+
+export default function Sheet4SupplierBuyer({ selectedMonth: propSelectedMonth }: Sheet4SupplierBuyerProps) {
   const { data, isLoading, error, refreshData } = useSheet4CompleteData();
   const { periodFilter } = usePeriodFilter();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(propSelectedMonth || null);
 
   // Filtrar dados
   const filteredRows = useMemo(() => {

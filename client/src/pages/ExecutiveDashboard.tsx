@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { TrendingUp, Package, Users, ShoppingCart, AlertCircle, CheckCircle } from 'lucide-react';
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useSheet1Data } from '@/hooks/useSheet1Data';
 import { useSheet2Data } from '@/hooks/useSheet2Data';
 import { useSheet3Data } from '@/hooks/useSheet3Data';
@@ -23,7 +24,11 @@ interface KPICard {
   description?: string;
 }
 
-export default function ExecutiveDashboard() {
+interface ExecutiveDashboardProps {
+  selectedMonth?: string | null;
+}
+
+export default function ExecutiveDashboard({ selectedMonth }: ExecutiveDashboardProps) {
   const { data: sheet1Data } = useSheet1Data();
   const { data: sheet2Data } = useSheet2Data();
   const { data: sheet3Data } = useSheet3Data();
@@ -233,6 +238,45 @@ export default function ExecutiveDashboard() {
     return kpiList;
   }, [sheet1Data, sheet2Data, sheet3Data, sheet4Data]);
 
+  // Função para Top 10 Fornecedores por Valor
+  const getTopSuppliersByValue = () => {
+    if (sheet4Data.length === 0) return [];
+    const supplierMap = new Map<string, number>();
+    sheet4Data.forEach(row => {
+      const supplier = String(row.FORNECEDOR || 'Desconhecido');
+      const monthlyValue = [
+        Number(row.JAN) || 0, Number(row.FEV) || 0, Number(row.MAR) || 0,
+        Number(row.ABR) || 0, Number(row.MAI) || 0, Number(row.JUN) || 0,
+        Number(row.JUL) || 0, Number(row.AGO) || 0, Number(row.SET) || 0,
+        Number(row.OUT) || 0, Number(row.NOV) || 0, Number(row.DEZ) || 0
+      ].reduce((a, b) => a + b, 0);
+      supplierMap.set(supplier, (supplierMap.get(supplier) || 0) + monthlyValue);
+    });
+    return Array.from(supplierMap.entries())
+      .map(([name, value]) => ({ name: name.substring(0, 15), value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 10);
+  };
+
+  // Função para Distribuição por Comprador
+  const getBuyerDistribution = () => {
+    if (sheet4Data.length === 0) return [];
+    const buyerMap = new Map<string, number>();
+    sheet4Data.forEach(row => {
+      const buyer = String(row['COMPRADOR RESUMIDO'] || 'Desconhecido');
+      const monthlyValue = [
+        Number(row.JAN) || 0, Number(row.FEV) || 0, Number(row.MAR) || 0,
+        Number(row.ABR) || 0, Number(row.MAI) || 0, Number(row.JUN) || 0,
+        Number(row.JUL) || 0, Number(row.AGO) || 0, Number(row.SET) || 0,
+        Number(row.OUT) || 0, Number(row.NOV) || 0, Number(row.DEZ) || 0
+      ].reduce((a, b) => a + b, 0);
+      buyerMap.set(buyer, (buyerMap.get(buyer) || 0) + monthlyValue);
+    });
+    return Array.from(buyerMap.entries())
+      .map(([name, value]) => ({ name: name.substring(0, 12), value }))
+      .sort((a, b) => b.value - a.value);
+  };
+
   return (
     <div className="space-y-6">
       {/* Título */}
@@ -323,6 +367,51 @@ export default function ExecutiveDashboard() {
               </p>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Gráficos Consolidados */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Top 10 Fornecedores por Valor */}
+        <div className="card-metric">
+          <h3 className="text-lg font-semibold mb-4 text-foreground">
+            Top 10 Fornecedores por Valor Total
+          </h3>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={getTopSuppliersByValue()}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis dataKey="name" stroke="#6b7280" angle={-45} textAnchor="end" height={80} />
+              <YAxis stroke="#6b7280" />
+              <Tooltip formatter={(value: any) => `R$ ${(value / 1000000).toFixed(1)}M`} />
+              <Bar dataKey="value" fill="#06b6d4" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Distribuição por Comprador */}
+        <div className="card-metric">
+          <h3 className="text-lg font-semibold mb-4 text-foreground">
+            Distribuição de Valor por Comprador
+          </h3>
+          <ResponsiveContainer width="100%" height={220}>
+            <PieChart>
+              <Pie
+                data={getBuyerDistribution()}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, value }) => `${name}: R$ ${(value / 1000000).toFixed(0)}M`}
+                outerRadius={70}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {getBuyerDistribution().map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={['#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6', '#ec4899'][index % 6]} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value: any) => `R$ ${(value / 1000000).toFixed(1)}M`} />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
       </div>
 

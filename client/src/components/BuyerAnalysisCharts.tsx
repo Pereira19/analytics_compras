@@ -90,7 +90,7 @@ export default function BuyerAnalysisCharts({ data }: BuyerAnalysisChartsProps) 
         <h3 className="text-lg font-semibold mb-4 text-foreground">
           Nível de Serviço por Comprador
         </h3>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={220}>
           <BarChart data={chartData.buyerMetrics}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#6b7280" />
@@ -113,7 +113,7 @@ export default function BuyerAnalysisCharts({ data }: BuyerAnalysisChartsProps) 
         <h3 className="text-lg font-semibold mb-4 text-foreground">
           Análise Multidimensional por Comprador
         </h3>
-        <ResponsiveContainer width="100%" height={350}>
+        <ResponsiveContainer width="100%" height={260}>
           <RadarChart data={chartData.radarData}>
             <PolarGrid stroke="#e5e7eb" />
             <PolarAngleAxis dataKey="name" stroke="#6b7280" />
@@ -137,7 +137,7 @@ export default function BuyerAnalysisCharts({ data }: BuyerAnalysisChartsProps) 
         <h3 className="text-lg font-semibold mb-4 text-foreground">
           Valor de Estoque: Custo vs Venda
         </h3>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={220}>
           <BarChart data={chartData.valueComparison}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#6b7280" />

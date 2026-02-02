@@ -7,6 +7,10 @@ import BuyerAnalysisCharts from '@/components/BuyerAnalysisCharts';
 import ExportPDFButton from '@/components/ExportPDFButton';
 import { usePeriodFilter, getPeriodLabel } from '@/contexts/PeriodFilterContext';
 
+interface Sheet3BuyerAnalysisProps {
+  selectedMonth?: string | null;
+}
+
 interface BuyerRecord {
   COD: number;
   COMPRADOR: string;

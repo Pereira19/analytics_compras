@@ -119,7 +119,7 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
           Top 30 Fornecedores por Nível de Serviço
         </h3>
         <p className="text-xs text-muted-foreground mb-3">Mostrando distribuição completa de desempenho</p>
-        <ResponsiveContainer width="100%" height={350}>
+        <ResponsiveContainer width="100%" height={250}>
           <LineChart data={chartData.topSuppliers}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#6b7280" angle={-45} textAnchor="end" height={80} />
@@ -142,7 +142,7 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
         <h3 className="text-lg font-semibold mb-4 text-foreground">
           Top 10 Fornecedores por Ruptura (%)
         </h3>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={220}>
           <BarChart data={chartData.topRuptureSuppliers}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#6b7280" angle={-45} textAnchor="end" height={80} />
@@ -166,7 +166,7 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
           Análise: Ruptura vs Excesso (Scatter Plot)
         </h3>
         <p className="text-xs text-muted-foreground mb-3">Tamanho do ponto = Valor de Estoque | Cor = Nível de Risco (Verde=Baixo, Amarelo=Médio, Vermelho=Alto)</p>
-        <ResponsiveContainer width="100%" height={350}>
+        <ResponsiveContainer width="100%" height={280}>
           <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="rupture" name="Ruptura (%)" stroke="#6b7280" label={{ value: 'Ruptura (%)', position: 'insideBottomRight', offset: -5 }} />
@@ -197,7 +197,7 @@ export default function SupplierAnalysisCharts({ data }: SupplierAnalysisChartsP
         <h3 className="text-lg font-semibold mb-4 text-foreground">
           Nível de Serviço Médio por Comprador
         </h3>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={220}>
           <BarChart data={chartData.buyerChartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#6b7280" />

@@ -9,7 +9,11 @@ import { usePeriodFilter } from '@/contexts/PeriodFilterContext';
 
 const ROWS_PER_PAGE = 15;
 
-export default function Sheet2SupplierAnalysis() {
+interface Sheet2SupplierAnalysisProps {
+  selectedMonth?: string | null;
+}
+
+export default function Sheet2SupplierAnalysis({ selectedMonth }: Sheet2SupplierAnalysisProps) {
   const { data, isLoading, error } = useSheet2Data();
   const { periodFilter } = usePeriodFilter();
   const [currentPage, setCurrentPage] = useState(1);
@@ -90,6 +94,83 @@ export default function Sheet2SupplierAnalysis() {
 
       {/* Gráficos */}
       <SupplierAnalysisCharts data={data} />
+
+      {/* Tabela Compacta: Top Fornecedores por Nível de Serviço */}
+      <div className="card-metric">
+        <h3 className="text-lg font-semibold mb-4 text-foreground">
+          Top Fornecedores por Nível de Serviço
+        </h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="px-4 py-3 text-left font-semibold text-foreground bg-secondary/30 text-xs uppercase tracking-wide">Fornecedor</th>
+                <th className="px-4 py-3 text-left font-semibold text-foreground bg-secondary/30 text-xs uppercase tracking-wide">Nível Serviço</th>
+                <th className="px-4 py-3 text-left font-semibold text-foreground bg-secondary/30 text-xs uppercase tracking-wide">Valor Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data
+                .sort((a, b) => (Number(b['NIVEL SERVIÇO RUPTURA S/ PENDÊNCIA']) || 0) - (Number(a['NIVEL SERVIÇO RUPTURA S/ PENDÊNCIA']) || 0))
+                .slice(0, 15)
+                .map((row, idx) => {
+                  const serviceLevel = Number(row['NIVEL SERVIÇO RUPTURA S/ PENDÊNCIA'] || 0) * 100;
+                  const bgColor = serviceLevel >= 90 ? 'bg-green-50' : serviceLevel >= 80 ? 'bg-yellow-50' : 'bg-red-50';
+                  return (
+                    <tr key={idx} className={`border-b border-border ${bgColor} hover:opacity-80 transition-opacity`}>
+                      <td className="px-4 py-3 font-medium text-foreground">{String(row.FORNECEDOR || '-').substring(0, 20)}</td>
+                      <td className="px-4 py-3 text-foreground">{serviceLevel.toFixed(2)}%</td>
+                      <td className="px-4 py-3 text-foreground">R$ {((Number(row['VALOR ESTOQUE PREÇO VENDA']) || 0) / 1000000).toFixed(2)}M</td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Tabela com Heatmap: Ruptura vs Excesso */}
+      <div className="card-metric">
+        <h3 className="text-lg font-semibold mb-4 text-foreground">
+          Análise: Ruptura vs Excesso (Heatmap)
+        </h3>
+        <p className="text-xs text-muted-foreground mb-4">Cores: Azul (Ruptura Alta) | Vermelho (Excesso Alto) | Verde (Baixo Risco)</p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="px-4 py-3 text-left font-semibold text-foreground bg-secondary/30 text-xs uppercase tracking-wide">Fornecedor</th>
+                <th className="px-4 py-3 text-left font-semibold text-foreground bg-secondary/30 text-xs uppercase tracking-wide">Ruptura</th>
+                <th className="px-4 py-3 text-left font-semibold text-foreground bg-secondary/30 text-xs uppercase tracking-wide">Excesso</th>
+                <th className="px-4 py-3 text-left font-semibold text-foreground bg-secondary/30 text-xs uppercase tracking-wide">%Ruptura</th>
+                <th className="px-4 py-3 text-left font-semibold text-foreground bg-secondary/30 text-xs uppercase tracking-wide">%Excesso</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data
+                .sort((a, b) => (Number(b['% RUPTURA TOTAL']) || 0) - (Number(a['% RUPTURA TOTAL']) || 0))
+                .slice(0, 20)
+                .map((row, idx) => {
+                  const rupture = Number(row['% RUPTURA TOTAL'] || 0) * 100;
+                  const excess = Number(row['% EXCESSO TOTAL'] || 0) * 100;
+                  let bgColor = 'bg-green-50';
+                  if (rupture > 10) bgColor = 'bg-blue-100';
+                  if (excess > 30) bgColor = 'bg-red-100';
+                  if (rupture > 10 && excess > 30) bgColor = 'bg-purple-100';
+                  return (
+                    <tr key={idx} className={`border-b border-border ${bgColor} hover:opacity-80 transition-opacity`}>
+                      <td className="px-4 py-3 font-medium text-foreground">{String(row.FORNECEDOR || '-').substring(0, 20)}</td>
+                      <td className="px-4 py-3 text-foreground">{Number(row['% RUPTURA TOTAL'] || 0).toFixed(4)}</td>
+                      <td className="px-4 py-3 text-foreground">{Number(row['% EXCESSO TOTAL'] || 0).toFixed(4)}</td>
+                      <td className="px-4 py-3 text-foreground font-semibold text-red-600">{rupture.toFixed(2)}%</td>
+                      <td className="px-4 py-3 text-foreground font-semibold text-orange-600">{excess.toFixed(2)}%</td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {/* Tabela Detalhada */}
       <div className="card-metric">

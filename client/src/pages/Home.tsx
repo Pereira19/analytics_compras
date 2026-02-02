@@ -84,7 +84,7 @@ export default function Home() {
           {/* Content */}
           {ActiveComponent && (
             <div className="animate-in fade-in duration-300">
-              <ActiveComponent />
+              <ActiveComponent selectedMonth={selectedMonth} />
             </div>
           )}
         </div>

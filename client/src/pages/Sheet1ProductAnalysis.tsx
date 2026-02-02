@@ -9,7 +9,11 @@ import { useSheet1Data, Sheet1Record } from '@/hooks/useSheet1Data';
 
 const ROWS_PER_PAGE = 20;
 
-export default function Sheet1ProductAnalysis() {
+interface Sheet1ProductAnalysisProps {
+  selectedMonth?: string | null;
+}
+
+export default function Sheet1ProductAnalysis({ selectedMonth }: Sheet1ProductAnalysisProps) {
   const { data, isLoading, error } = useSheet1Data();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');

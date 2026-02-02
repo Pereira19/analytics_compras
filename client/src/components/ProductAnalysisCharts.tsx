@@ -133,7 +133,7 @@ export default function ProductAnalysisCharts({ data }: ProductAnalysisChartsPro
         <h3 className="text-lg font-semibold mb-4 text-foreground">
           Distribuição por Curva ABC
         </h3>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={220}>
           <PieChart>
             <Pie
               data={chartData.curvaData}
@@ -159,7 +159,7 @@ export default function ProductAnalysisCharts({ data }: ProductAnalysisChartsPro
         <h3 className="text-lg font-semibold mb-4 text-foreground">
           Top 10 Fornecedores por Quantidade de Produtos
         </h3>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={220}>
           <BarChart data={chartData.topFornecedores}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#6b7280" angle={-45} textAnchor="end" height={100} />
@@ -181,7 +181,7 @@ export default function ProductAnalysisCharts({ data }: ProductAnalysisChartsPro
         <h3 className="text-lg font-semibold mb-4 text-foreground">
           Top 10 Compradores por Quantidade de Produtos
         </h3>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={220}>
           <BarChart data={chartData.topCompradores}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#6b7280" />
@@ -206,7 +206,7 @@ export default function ProductAnalysisCharts({ data }: ProductAnalysisChartsPro
         <p className="text-sm text-muted-foreground mb-4">
           Tamanho das bolhas = quantidade de produtos | Posição = estoque médio vs giro médio
         </p>
-        <ResponsiveContainer width="100%" height={350}>
+        <ResponsiveContainer width="100%" height={280}>
           <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis 
@@ -265,7 +265,7 @@ export default function ProductAnalysisCharts({ data }: ProductAnalysisChartsPro
         <p className="text-sm text-muted-foreground mb-4">
           Cores indicam a Curva ABC de cada produto
         </p>
-        <ResponsiveContainer width="100%" height={350}>
+        <ResponsiveContainer width="100%" height={280}>
           <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="estoque" name="Estoque" stroke="#6b7280" />
