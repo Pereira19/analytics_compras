@@ -25,6 +25,8 @@ import {
 const ROWS_PER_PAGE = 15;
 const COLORS = ['#06b6d4', '#0ea5e9', '#3b82f6', '#8b5cf6', '#ec4899'];
 
+type AggregationType = 'detalhado' | 'fornecedor' | 'comprador';
+
 interface Sheet4SupplierBuyerProps {
   selectedMonth?: string | null;
 }
@@ -35,10 +37,63 @@ export default function Sheet4SupplierBuyer({ selectedMonth: propSelectedMonth }
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMonth, setSelectedMonth] = useState<string | null>(propSelectedMonth || null);
+  const [aggregationType, setAggregationType] = useState<AggregationType>('detalhado');
+
+  // Agregar dados conforme tipo selecionado
+  const aggregatedData = useMemo(() => {
+    if (aggregationType === 'detalhado') {
+      return data;
+    }
+
+    const months = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+    const aggregated = new Map<string, any>();
+
+    data.forEach(row => {
+      let key: string;
+      if (aggregationType === 'fornecedor') {
+        key = row['FORNECEDOR RESUMIDO'] || row.FORNECEDOR;
+      } else {
+        key = row['COMPRADOR RESUMIDO'] || row['COMPRADOR 01/26'];
+      }
+
+      if (!aggregated.has(key)) {
+        aggregated.set(key, {
+          COD: row.COD,
+          FORNECEDOR: aggregationType === 'fornecedor' ? key : 'Agregado',
+          'FORNECEDOR RESUMIDO': aggregationType === 'fornecedor' ? key : 'Agregado',
+          COMPRADOR: aggregationType === 'comprador' ? key : 'Agregado',
+          'COMPRADOR RESUMIDO': aggregationType === 'comprador' ? key : 'Agregado',
+          'COMPRADOR 01/26': aggregationType === 'comprador' ? key : 'Agregado',
+          'STATUS DA MARCA': row['STATUS DA MARCA'],
+          'PROJETO MARGEM': 0,
+          'PROJETO VALOR': 0,
+          count: 0,
+          ...Object.fromEntries(months.map(m => [m, 0]))
+        });
+      }
+
+      const agg = aggregated.get(key)!;
+      months.forEach(month => {
+        agg[month] = (agg[month] || 0) + (row[month as keyof Sheet4CompleteRecord] as number || 0);
+      });
+      agg['PROJETO MARGEM'] = (agg['PROJETO MARGEM'] || 0) + (row['PROJETO MARGEM'] || 0);
+      agg['PROJETO VALOR'] = (agg['PROJETO VALOR'] || 0) + (row['PROJETO VALOR'] || 0);
+      agg.count = (agg.count || 0) + 1;
+    });
+
+    // Calcular margem média
+    aggregated.forEach(agg => {
+      if (agg.count > 0) {
+        agg['PROJETO MARGEM'] = agg['PROJETO MARGEM'] / agg.count;
+      }
+    });
+
+    return Array.from(aggregated.values());
+  }, [data, aggregationType]);
 
   // Filtrar dados
   const filteredRows = useMemo(() => {
-    let filtered = data;
+    let filtered = aggregatedData;
 
     // Aplicar filtro de busca
     if (searchTerm) {
@@ -50,7 +105,7 @@ export default function Sheet4SupplierBuyer({ selectedMonth: propSelectedMonth }
     }
 
     return filtered;
-  }, [data, searchTerm]);
+  }, [aggregatedData, searchTerm]);
 
   // Dados com filtro de período aplicado (do contexto global)
   const dataWithPeriodFilter = useMemo(() => {
@@ -228,6 +283,49 @@ export default function Sheet4SupplierBuyer({ selectedMonth: propSelectedMonth }
         <UpdateDataButton onDataUpdate={refreshData} />
       </div>
 
+      {/* Botões de Agrupamento */}
+      <div className="flex gap-3 bg-white rounded-lg p-4 border border-border shadow-sm">
+        <Button
+          onClick={() => {
+            setAggregationType('detalhado');
+            setCurrentPage(1);
+          }}
+          className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+            aggregationType === 'detalhado'
+              ? 'bg-gradient-to-r from-cyan-500 to-teal-500 text-white shadow-md'
+              : 'bg-secondary text-foreground hover:bg-secondary/80'
+          }`}
+        >
+          📊 Detalhado
+        </Button>
+        <Button
+          onClick={() => {
+            setAggregationType('fornecedor');
+            setCurrentPage(1);
+          }}
+          className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+            aggregationType === 'fornecedor'
+              ? 'bg-gradient-to-r from-cyan-500 to-teal-500 text-white shadow-md'
+              : 'bg-secondary text-foreground hover:bg-secondary/80'
+          }`}
+        >
+          🏭 Por Fornecedor
+        </Button>
+        <Button
+          onClick={() => {
+            setAggregationType('comprador');
+            setCurrentPage(1);
+          }}
+          className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+            aggregationType === 'comprador'
+              ? 'bg-gradient-to-r from-cyan-500 to-teal-500 text-white shadow-md'
+              : 'bg-secondary text-foreground hover:bg-secondary/80'
+          }`}
+        >
+          👥 Por Comprador
+        </Button>
+      </div>
+
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {kpis.map((kpi, idx) => {
@@ -314,7 +412,7 @@ export default function Sheet4SupplierBuyer({ selectedMonth: propSelectedMonth }
       {/* Evolução Mensal */}
       <div className="card-metric">
         <h3 className="text-lg font-semibold mb-4 text-foreground">
-          Evolução Mensal de Faturamento
+          Evolução de Vendas Mensal
         </h3>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={chartData.monthlyData}>
@@ -343,21 +441,20 @@ export default function Sheet4SupplierBuyer({ selectedMonth: propSelectedMonth }
         </ResponsiveContainer>
       </div>
 
-      {/* Tabela Detalhada */}
+      {/* Tabela */}
       <div className="card-metric">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground">
-            Dados Detalhados ({filteredRows.length})
+            {aggregationType === 'detalhado' ? 'Dados Detalhados' : aggregationType === 'fornecedor' ? 'Agregado por Fornecedor' : 'Agregado por Comprador'}
           </h3>
           <Input
-            type="text"
-            placeholder="Buscar fornecedor, comprador..."
+            placeholder="Buscar..."
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-80"
+            className="w-64"
           />
         </div>
 
@@ -376,37 +473,24 @@ export default function Sheet4SupplierBuyer({ selectedMonth: propSelectedMonth }
               </tr>
             </thead>
             <tbody>
-              {currentRows.map((row, rowIndex) => (
-                <tr
-                  key={rowIndex}
-                  className="border-b border-border hover:bg-secondary/20 transition-colors"
-                >
-                  <td className="px-4 py-3 text-foreground font-mono text-xs">
-                    {row.COD}
-                  </td>
-                  <td className="px-4 py-3 text-foreground max-w-xs truncate">
-                    {row['FORNECEDOR RESUMIDO']}
-                  </td>
-                  <td className="px-4 py-3 text-foreground font-medium">
-                    {row['COMPRADOR 01/26']}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-800">
-                      {row['STATUS DA MARCA'] || 'N/A'}
+              {currentRows.map((row, idx) => (
+                <tr key={idx} className="border-b border-border hover:bg-secondary/20 transition-colors">
+                  <td className="px-4 py-3 font-medium text-foreground">{row.COD}</td>
+                  <td className="px-4 py-3 text-foreground">{String(row.FORNECEDOR || '-').substring(0, 20)}</td>
+                  <td className="px-4 py-3 text-foreground">{String(row.COMPRADOR || row['COMPRADOR 01/26'] || '-').substring(0, 20)}</td>
+                  <td className="px-4 py-3 text-foreground">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      row['STATUS DA MARCA'] === 'IMPORTANTE'
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {row['STATUS DA MARCA'] || '-'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-foreground text-right">
-                    {((row['PROJETO MARGEM'] || 0) * 100).toFixed(2)}%
-                  </td>
-                  <td className="px-4 py-3 text-foreground text-right font-semibold">
-                    {selectedMonth ? `R$ ${((row.monthValue || 0) / 1000000).toFixed(2)}M` : `R$ ${((row.periodValue || 0) / 1000000).toFixed(2)}M`}
-                  </td>
-                  <td className="px-4 py-3 text-foreground text-right text-xs">
-                    R$ {(row.JAN / 1000000).toFixed(2)}M
-                  </td>
-                  <td className="px-4 py-3 text-foreground text-right text-xs">
-                    R$ {(row.DEZ / 1000000).toFixed(2)}M
-                  </td>
+                  <td className="px-4 py-3 text-foreground">{((row['PROJETO MARGEM'] || 0) * 100).toFixed(1)}%</td>
+                  <td className="px-4 py-3 text-foreground">R$ {((row['PROJETO VALOR'] || 0) / 1000000).toFixed(2)}M</td>
+                  <td className="px-4 py-3 text-foreground">R$ {((row.JAN || 0) / 1000000).toFixed(2)}M</td>
+                  <td className="px-4 py-3 text-foreground">R$ {((row.DEZ || 0) / 1000000).toFixed(2)}M</td>
                 </tr>
               ))}
             </tbody>
@@ -414,24 +498,27 @@ export default function Sheet4SupplierBuyer({ selectedMonth: propSelectedMonth }
         </div>
 
         {/* Paginação */}
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
-          <p className="text-xs text-muted-foreground">
-            Página {currentPage} de {totalPages} ({filteredRows.length} registros)
+        <div className="flex items-center justify-between mt-6">
+          <p className="text-sm text-muted-foreground">
+            Mostrando {startIndex + 1}-{Math.min(endIndex, filteredRows.length)} de {filteredRows.length}
           </p>
           <div className="flex gap-2">
             <Button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              size="sm"
               variant="outline"
+              size="sm"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
+            <span className="px-3 py-2 text-sm font-medium text-foreground">
+              {currentPage} / {totalPages}
+            </span>
             <Button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
-              size="sm"
               variant="outline"
+              size="sm"
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
