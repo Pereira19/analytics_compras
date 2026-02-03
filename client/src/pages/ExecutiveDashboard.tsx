@@ -101,20 +101,20 @@ export default function ExecutiveDashboard({ selectedMonth }: ExecutiveDashboard
         },
         {
           title: 'Nível de Serviço Médio',
-          value: avgServiceLevel.toFixed(2),
+          value: (avgServiceLevel * 100).toFixed(2),
           unit: '%',
           icon: <CheckCircle className="w-6 h-6" />,
-          color: avgServiceLevel >= 90 ? 'text-green-600' : avgServiceLevel >= 80 ? 'text-yellow-600' : 'text-red-600',
-          bgColor: avgServiceLevel >= 90 ? 'bg-green-50' : avgServiceLevel >= 80 ? 'bg-yellow-50' : 'bg-red-50',
+          color: (avgServiceLevel * 100) >= 90 ? 'text-green-600' : (avgServiceLevel * 100) >= 80 ? 'text-yellow-600' : 'text-red-600',
+          bgColor: (avgServiceLevel * 100) >= 90 ? 'bg-green-50' : (avgServiceLevel * 100) >= 80 ? 'bg-yellow-50' : 'bg-red-50',
           description: 'Desempenho'
         },
         {
           title: 'Taxa de Ruptura Média',
-          value: avgBreakageRate.toFixed(2),
+          value: (avgBreakageRate * 100).toFixed(2),
           unit: '%',
           icon: <AlertCircle className="w-6 h-6" />,
-          color: avgBreakageRate <= 5 ? 'text-green-600' : avgBreakageRate <= 10 ? 'text-yellow-600' : 'text-red-600',
-          bgColor: avgBreakageRate <= 5 ? 'bg-green-50' : avgBreakageRate <= 10 ? 'bg-yellow-50' : 'bg-red-50',
+          color: (avgBreakageRate * 100) <= 5 ? 'text-green-600' : (avgBreakageRate * 100) <= 10 ? 'text-yellow-600' : 'text-red-600',
+          bgColor: (avgBreakageRate * 100) <= 5 ? 'bg-green-50' : (avgBreakageRate * 100) <= 10 ? 'bg-yellow-50' : 'bg-red-50',
           description: 'Falta de estoque'
         },
         {
@@ -147,20 +147,20 @@ export default function ExecutiveDashboard({ selectedMonth }: ExecutiveDashboard
         },
         {
           title: 'Nível de Serviço (Comprador)',
-          value: avgServiceLevel.toFixed(2),
+          value: (avgServiceLevel * 100).toFixed(2),
           unit: '%',
           icon: <CheckCircle className="w-6 h-6" />,
-          color: avgServiceLevel >= 90 ? 'text-green-600' : avgServiceLevel >= 80 ? 'text-yellow-600' : 'text-red-600',
-          bgColor: avgServiceLevel >= 90 ? 'bg-green-50' : avgServiceLevel >= 80 ? 'bg-yellow-50' : 'bg-red-50',
+          color: (avgServiceLevel * 100) >= 90 ? 'text-green-600' : (avgServiceLevel * 100) >= 80 ? 'text-yellow-600' : 'text-red-600',
+          bgColor: (avgServiceLevel * 100) >= 90 ? 'bg-green-50' : (avgServiceLevel * 100) >= 80 ? 'bg-yellow-50' : 'bg-red-50',
           description: 'Atendimento'
         },
         {
           title: 'Taxa de Ruptura (Comprador)',
-          value: avgBreakageRate.toFixed(2),
+          value: (avgBreakageRate * 100).toFixed(2),
           unit: '%',
           icon: <AlertCircle className="w-6 h-6" />,
-          color: avgBreakageRate <= 5 ? 'text-green-600' : avgBreakageRate <= 10 ? 'text-yellow-600' : 'text-red-600',
-          bgColor: avgBreakageRate <= 5 ? 'bg-green-50' : avgBreakageRate <= 10 ? 'bg-yellow-50' : 'bg-red-50',
+          color: (avgBreakageRate * 100) <= 5 ? 'text-green-600' : (avgBreakageRate * 100) <= 10 ? 'text-yellow-600' : 'text-red-600',
+          bgColor: (avgBreakageRate * 100) <= 5 ? 'bg-green-50' : (avgBreakageRate * 100) <= 10 ? 'bg-yellow-50' : 'bg-red-50',
           description: 'Falta de estoque'
         },
         {
@@ -217,11 +217,11 @@ export default function ExecutiveDashboard({ selectedMonth }: ExecutiveDashboard
         },
         {
           title: 'Margem Média',
-          value: avgMargin.toFixed(2),
+          value: (avgMargin * 100).toFixed(2),
           unit: '%',
           icon: <CheckCircle className="w-6 h-6" />,
-          color: avgMargin >= 25 ? 'text-green-600' : avgMargin >= 20 ? 'text-yellow-600' : 'text-orange-600',
-          bgColor: avgMargin >= 25 ? 'bg-green-50' : avgMargin >= 20 ? 'bg-yellow-50' : 'bg-orange-50',
+          color: (avgMargin * 100) >= 25 ? 'text-green-600' : (avgMargin * 100) >= 20 ? 'text-yellow-600' : 'text-orange-600',
+          bgColor: (avgMargin * 100) >= 25 ? 'bg-green-50' : (avgMargin * 100) >= 20 ? 'bg-yellow-50' : 'bg-orange-50',
           description: 'Rentabilidade'
         },
         {
