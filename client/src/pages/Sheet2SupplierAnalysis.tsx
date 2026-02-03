@@ -111,6 +111,7 @@ export default function Sheet2SupplierAnalysis({ selectedMonth }: Sheet2Supplier
             </thead>
             <tbody>
               {data
+                .filter(row => row.Fornecedor && row.Fornecedor.trim() !== '' && String(row.COD || '').toUpperCase() !== 'TOTAL')
                 .sort((a, b) => (Number(b['NIVEL SERVIÇO RUPTURA S/ PENDÊNCIA']) || 0) - (Number(a['NIVEL SERVIÇO RUPTURA S/ PENDÊNCIA']) || 0))
                 .slice(0, 15)
                 .map((row, idx) => {
@@ -118,7 +119,7 @@ export default function Sheet2SupplierAnalysis({ selectedMonth }: Sheet2Supplier
                   const bgColor = serviceLevel >= 90 ? 'bg-green-50' : serviceLevel >= 80 ? 'bg-yellow-50' : 'bg-red-50';
                   return (
                     <tr key={idx} className={`border-b border-border ${bgColor} hover:opacity-80 transition-opacity`}>
-                      <td className="px-4 py-3 font-medium text-foreground">{String(row.FORNECEDOR || '-').substring(0, 20)}</td>
+                      <td className="px-4 py-3 font-medium text-foreground">{String(row.Fornecedor || '-').substring(0, 20)}</td>
                       <td className="px-4 py-3 text-foreground">{serviceLevel.toFixed(2)}%</td>
                       <td className="px-4 py-3 text-foreground">R$ {((Number(row['VALOR ESTOQUE PREÇO VENDA']) || 0) / 1000000).toFixed(2)}M</td>
                     </tr>
@@ -148,6 +149,7 @@ export default function Sheet2SupplierAnalysis({ selectedMonth }: Sheet2Supplier
             </thead>
             <tbody>
               {data
+                .filter(row => row.Fornecedor && row.Fornecedor.trim() !== '' && String(row.COD || '').toUpperCase() !== 'TOTAL')
                 .sort((a, b) => (Number(b['% RUPTURA TOTAL']) || 0) - (Number(a['% RUPTURA TOTAL']) || 0))
                 .slice(0, 20)
                 .map((row, idx) => {
@@ -159,7 +161,7 @@ export default function Sheet2SupplierAnalysis({ selectedMonth }: Sheet2Supplier
                   if (rupture > 10 && excess > 30) bgColor = 'bg-purple-100';
                   return (
                     <tr key={idx} className={`border-b border-border ${bgColor} hover:opacity-80 transition-opacity`}>
-                      <td className="px-4 py-3 font-medium text-foreground">{String(row.FORNECEDOR || '-').substring(0, 20)}</td>
+                      <td className="px-4 py-3 font-medium text-foreground">{String(row.Fornecedor || '-').substring(0, 20)}</td>
                       <td className="px-4 py-3 text-foreground">{Number(row['% RUPTURA TOTAL'] || 0).toFixed(4)}</td>
                       <td className="px-4 py-3 text-foreground">{Number(row['% EXCESSO TOTAL'] || 0).toFixed(4)}</td>
                       <td className="px-4 py-3 text-foreground font-semibold text-red-600">{rupture.toFixed(2)}%</td>
