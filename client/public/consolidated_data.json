@@ -1,0 +1,765 @@
+{
+  "metadata": {
+    "lastUpdate": "2026-02-11",
+    "totalRecords": 550,
+    "filiais": [
+      "1",
+      "7",
+      "8",
+      "9",
+      "GERAL"
+    ],
+    "periodo": "2023-2026"
+  },
+  "summary": {
+    "totalFiliais": 5,
+    "totalFornecedores": 109,
+    "totalCompradores": 5,
+    "totalProdutos": 550,
+    "estoqueTotal": 71778332.63,
+    "faturamento2026": 28825090.49,
+    "entrada2026": 26275206.85
+  },
+  "aggregations": {
+    "byFilial": {
+      "1": {
+        "totalProdutos": 110,
+        "estoqueVenda": 1955439.0500000005,
+        "faturamento2026": 1034630.8999999999,
+        "entrada2026": 219611.65,
+        "nivelServicoMedio": 0.5704,
+        "rupturaPctMedio": 0.2752,
+        "excesoPctMedio": 0.3192,
+        "count": 110
+      },
+      "7": {
+        "totalProdutos": 110,
+        "estoqueVenda": 34590326.27000002,
+        "faturamento2026": 13503969.850000003,
+        "entrada2026": 12705948.099999996,
+        "nivelServicoMedio": 0.6829,
+        "rupturaPctMedio": 0.2386,
+        "excesoPctMedio": 0.2583,
+        "count": 110
+      },
+      "8": {
+        "totalProdutos": 110,
+        "estoqueVenda": 22390244.509999998,
+        "faturamento2026": 8669019.99,
+        "entrada2026": 8311265.130000001,
+        "nivelServicoMedio": 0.6772,
+        "rupturaPctMedio": 0.2148,
+        "excesoPctMedio": 0.2669,
+        "count": 110
+      },
+      "9": {
+        "totalProdutos": 110,
+        "estoqueVenda": 12842322.800000004,
+        "faturamento2026": 5617469.75,
+        "entrada2026": 5038381.970000002,
+        "nivelServicoMedio": 0.5485,
+        "rupturaPctMedio": 0.1931,
+        "excesoPctMedio": 0.1901,
+        "count": 110
+      },
+      "GERAL": {
+        "totalProdutos": 110,
+        "estoqueVenda": 0,
+        "faturamento2026": 0,
+        "entrada2026": 0,
+        "nivelServicoMedio": 0.0,
+        "rupturaPctMedio": 0.0,
+        "excesoPctMedio": 0.0,
+        "count": 110
+      }
+    },
+    "byFornecedor": {
+      "ABOVE": {
+        "totalProdutos": 5,
+        "estoqueVenda": 265792.36999999994,
+        "faturamento2026": 77072.22,
+        "count": 5
+      },
+      "AEROFLEX": {
+        "totalProdutos": 5,
+        "estoqueVenda": 493446.85000000003,
+        "faturamento2026": 241796.69999999998,
+        "count": 5
+      },
+      "ALTAMODA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 568793.37,
+        "faturamento2026": 330136.65,
+        "count": 5
+      },
+      "AMAKHA PARIS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 868519.0099999999,
+        "faturamento2026": 273435.12,
+        "count": 5
+      },
+      "ANACONDA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 294250.74000000005,
+        "faturamento2026": 164731.69999999998,
+        "count": 5
+      },
+      "ATALAIA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 67866.62,
+        "faturamento2026": 26051.93,
+        "count": 5
+      },
+      "BEAUTY COLOR": {
+        "totalProdutos": 5,
+        "estoqueVenda": 637045.8900000001,
+        "faturamento2026": 189441.19,
+        "count": 5
+      },
+      "BEIRA ALTA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 0,
+        "faturamento2026": 20.46,
+        "count": 5
+      },
+      "BELLIZ": {
+        "totalProdutos": 5,
+        "estoqueVenda": 349285.18000000005,
+        "faturamento2026": 346126.21,
+        "count": 5
+      },
+      "BEYOUNG": {
+        "totalProdutos": 5,
+        "estoqueVenda": 46731.18,
+        "faturamento2026": 378.37,
+        "count": 5
+      },
+      "BRAE": {
+        "totalProdutos": 5,
+        "estoqueVenda": 424309.33999999997,
+        "faturamento2026": 46101.74,
+        "count": 5
+      },
+      "CADIVEU": {
+        "totalProdutos": 5,
+        "estoqueVenda": 694146.27,
+        "faturamento2026": 238344.78999999998,
+        "count": 5
+      },
+      "CAPICILIN": {
+        "totalProdutos": 5,
+        "estoqueVenda": 156775.5,
+        "faturamento2026": 142101.68,
+        "count": 5
+      },
+      "CLESS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 799273.58,
+        "faturamento2026": 480297.62,
+        "count": 5
+      },
+      "CONDOR": {
+        "totalProdutos": 5,
+        "estoqueVenda": 553359.3300000001,
+        "faturamento2026": 261774.00999999998,
+        "count": 5
+      },
+      "COTTON BABY": {
+        "totalProdutos": 5,
+        "estoqueVenda": 0,
+        "faturamento2026": 0,
+        "count": 5
+      },
+      "CREMER": {
+        "totalProdutos": 5,
+        "estoqueVenda": 508162.3999999999,
+        "faturamento2026": 183900.43,
+        "count": 5
+      },
+      "CRISMAS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 236992.74,
+        "faturamento2026": 133842.13999999998,
+        "count": 5
+      },
+      "DABELLE DUTY": {
+        "totalProdutos": 5,
+        "estoqueVenda": 3260231.96,
+        "faturamento2026": 2453852.0799999996,
+        "count": 5
+      },
+      "DAILUS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 1116628.33,
+        "faturamento2026": 501288.6,
+        "count": 5
+      },
+      "DANA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 1414596.4899999998,
+        "faturamento2026": 426286.01,
+        "count": 5
+      },
+      "DARMA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 92396.91,
+        "faturamento2026": 72389.86,
+        "count": 5
+      },
+      "DAVENE": {
+        "totalProdutos": 5,
+        "estoqueVenda": 175350.78999999998,
+        "faturamento2026": 58257.65,
+        "count": 5
+      },
+      "DELLA E DELLE": {
+        "totalProdutos": 5,
+        "estoqueVenda": 424536.35,
+        "faturamento2026": 182604.88,
+        "count": 5
+      },
+      "DEPIMIEL": {
+        "totalProdutos": 5,
+        "estoqueVenda": 276048.33999999997,
+        "faturamento2026": 227074.69,
+        "count": 5
+      },
+      "DEPIROLL": {
+        "totalProdutos": 5,
+        "estoqueVenda": 224596.58,
+        "faturamento2026": 115131.2,
+        "count": 5
+      },
+      "DERMACHEM": {
+        "totalProdutos": 5,
+        "estoqueVenda": 160220.93,
+        "faturamento2026": 31819.749999999996,
+        "count": 5
+      },
+      "DERMACREAM": {
+        "totalProdutos": 5,
+        "estoqueVenda": 11990.86,
+        "faturamento2026": 761.1,
+        "count": 5
+      },
+      "DOMPEL": {
+        "totalProdutos": 5,
+        "estoqueVenda": 15482.0,
+        "faturamento2026": 4728.84,
+        "count": 5
+      },
+      "EICO": {
+        "totalProdutos": 5,
+        "estoqueVenda": 875935.37,
+        "faturamento2026": 592727.3,
+        "count": 5
+      },
+      "EMBELLEZE": {
+        "totalProdutos": 5,
+        "estoqueVenda": 782006.69,
+        "faturamento2026": 691265.2100000001,
+        "count": 5
+      },
+      "EVOLUXE": {
+        "totalProdutos": 5,
+        "estoqueVenda": 152221.13,
+        "faturamento2026": 118834.14,
+        "count": 5
+      },
+      "FARMAX": {
+        "totalProdutos": 5,
+        "estoqueVenda": 2138694.5200000005,
+        "faturamento2026": 870079.9199999999,
+        "count": 5
+      },
+      "FASHION": {
+        "totalProdutos": 5,
+        "estoqueVenda": 110380.6,
+        "faturamento2026": 40356.020000000004,
+        "count": 5
+      },
+      "FHACES": {
+        "totalProdutos": 5,
+        "estoqueVenda": 3531.6400000000003,
+        "faturamento2026": 7864.85,
+        "count": 5
+      },
+      "FOREVER LISS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 1032841.9099999999,
+        "faturamento2026": 521632.78,
+        "count": 5
+      },
+      "FRIZON": {
+        "totalProdutos": 5,
+        "estoqueVenda": 487876.42000000004,
+        "faturamento2026": 529504.1,
+        "count": 5
+      },
+      "GAROTA VIP": {
+        "totalProdutos": 5,
+        "estoqueVenda": 12251.56,
+        "faturamento2026": 6055.67,
+        "count": 5
+      },
+      "GELLU'S": {
+        "totalProdutos": 5,
+        "estoqueVenda": 147902.05999999994,
+        "faturamento2026": 56097.69,
+        "count": 5
+      },
+      "GIOVANNA BABY": {
+        "totalProdutos": 5,
+        "estoqueVenda": 1999657.6,
+        "faturamento2026": 650221.9,
+        "count": 5
+      },
+      "GOTA DOURADA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 1310083.0799999998,
+        "faturamento2026": 593984.61,
+        "count": 5
+      },
+      "GUMMY VITAMINAS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 1006141.64,
+        "faturamento2026": 370006.30000000005,
+        "count": 5
+      },
+      "HAIR EXTRATUS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 768506.09,
+        "faturamento2026": 218957.28,
+        "count": 5
+      },
+      "HARIBO": {
+        "totalProdutos": 5,
+        "estoqueVenda": 4403.639999999999,
+        "faturamento2026": 22.04,
+        "count": 5
+      },
+      "HIDRAMAIS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 58551.68,
+        "faturamento2026": 9634.939999999999,
+        "count": 5
+      },
+      "HIDRAN": {
+        "totalProdutos": 5,
+        "estoqueVenda": 113270.15,
+        "faturamento2026": 57336.380000000005,
+        "count": 5
+      },
+      "KAMALE\u00c3O": {
+        "totalProdutos": 5,
+        "estoqueVenda": 335952.70999999996,
+        "faturamento2026": 310412.22000000003,
+        "count": 5
+      },
+      "IMBAT LUVAS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 0,
+        "faturamento2026": 0,
+        "count": 5
+      },
+      "ITELY": {
+        "totalProdutos": 5,
+        "estoqueVenda": 312858.78,
+        "faturamento2026": 12468.8,
+        "count": 5
+      },
+      "JACQUES JANINE": {
+        "totalProdutos": 5,
+        "estoqueVenda": 494946.95000000007,
+        "faturamento2026": 155971.81,
+        "count": 5
+      },
+      "KANITZ": {
+        "totalProdutos": 5,
+        "estoqueVenda": 418253.92000000004,
+        "faturamento2026": 227994.26,
+        "count": 5
+      },
+      "KERT": {
+        "totalProdutos": 5,
+        "estoqueVenda": 277109.69999999995,
+        "faturamento2026": 108305.47,
+        "count": 5
+      },
+      "LABOTRAT": {
+        "totalProdutos": 5,
+        "estoqueVenda": 1485334.2199999997,
+        "faturamento2026": 470781.24,
+        "count": 5
+      },
+      "LEITE DE ROSAS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 231972.54999999996,
+        "faturamento2026": 125791.04999999999,
+        "count": 5
+      },
+      "LIFE B ACESSORIOS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 79165.31999999999,
+        "faturamento2026": 53871.04,
+        "count": 5
+      },
+      "LIZZE ELETRO (VAREJO)": {
+        "totalProdutos": 5,
+        "estoqueVenda": 0,
+        "faturamento2026": 0,
+        "count": 5
+      },
+      "LIZZ ELETRO": {
+        "totalProdutos": 5,
+        "estoqueVenda": 11668.390000000001,
+        "faturamento2026": 4407.3,
+        "count": 5
+      },
+      "LOLA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 9416646.169999994,
+        "faturamento2026": 3491184.88,
+        "count": 5
+      },
+      "MARCIA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 372388.91000000003,
+        "faturamento2026": 144623.11,
+        "count": 5
+      },
+      "MARCO BONI": {
+        "totalProdutos": 5,
+        "estoqueVenda": 212572.23,
+        "faturamento2026": 132024.46,
+        "count": 5
+      },
+      "MAX LOVE": {
+        "totalProdutos": 5,
+        "estoqueVenda": 38897.13,
+        "faturamento2026": 4778.59,
+        "count": 5
+      },
+      "MEMPHIS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 149563.71,
+        "faturamento2026": 70251.39,
+        "count": 5
+      },
+      "MERHEJE": {
+        "totalProdutos": 5,
+        "estoqueVenda": 72817.09,
+        "faturamento2026": 83114.61,
+        "count": 5
+      },
+      "MUNDIAL": {
+        "totalProdutos": 5,
+        "estoqueVenda": 1093269.05,
+        "faturamento2026": 451488.91000000003,
+        "count": 5
+      },
+      "MURIEL": {
+        "totalProdutos": 5,
+        "estoqueVenda": 6196824.589999996,
+        "faturamento2026": 1843689.08,
+        "count": 5
+      },
+      "NATHY": {
+        "totalProdutos": 5,
+        "estoqueVenda": 133409.23,
+        "faturamento2026": 84887.87000000001,
+        "count": 5
+      },
+      "NATUHAIR": {
+        "totalProdutos": 5,
+        "estoqueVenda": 2977938.3800000013,
+        "faturamento2026": 844568.96,
+        "count": 5
+      },
+      "NEVER": {
+        "totalProdutos": 5,
+        "estoqueVenda": 0,
+        "faturamento2026": 0,
+        "count": 5
+      },
+      "NUTRI BOMBA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 112179.23,
+        "faturamento2026": 49966.8,
+        "count": 5
+      },
+      "ORIENTE LIFE": {
+        "totalProdutos": 5,
+        "estoqueVenda": 405738.34,
+        "faturamento2026": 296112.53,
+        "count": 5
+      },
+      "POPDRAT": {
+        "totalProdutos": 5,
+        "estoqueVenda": 561313.01,
+        "faturamento2026": 278449.02,
+        "count": 5
+      },
+      "PURA ARTE": {
+        "totalProdutos": 5,
+        "estoqueVenda": 41664.71000000001,
+        "faturamento2026": 39090.049999999996,
+        "count": 5
+      },
+      "RARE WAY": {
+        "totalProdutos": 5,
+        "estoqueVenda": 339654.81,
+        "faturamento2026": 92916.01000000001,
+        "count": 5
+      },
+      "REVIEW CARE": {
+        "totalProdutos": 5,
+        "estoqueVenda": 0,
+        "faturamento2026": 65.68,
+        "count": 5
+      },
+      "RILEX PRESERVATIVOS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 5487.68,
+        "faturamento2026": 8884.74,
+        "count": 5
+      },
+      "ROSA SELVAGEM": {
+        "totalProdutos": 5,
+        "estoqueVenda": 44913.58,
+        "faturamento2026": 17354.089999999997,
+        "count": 5
+      },
+      "SALON LINE": {
+        "totalProdutos": 5,
+        "estoqueVenda": 14146023.630000003,
+        "faturamento2026": 3329975.63,
+        "count": 5
+      },
+      "SINTER": {
+        "totalProdutos": 5,
+        "estoqueVenda": 229656.25999999998,
+        "faturamento2026": 85837.03,
+        "count": 5
+      },
+      "SOFTHAIR": {
+        "totalProdutos": 5,
+        "estoqueVenda": 472437.18,
+        "faturamento2026": 272199.57,
+        "count": 5
+      },
+      "SUISSA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 1325.63,
+        "faturamento2026": 274.34,
+        "count": 5
+      },
+      "SURYA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 1035336.44,
+        "faturamento2026": 481367.26,
+        "count": 5
+      },
+      "THEPRO - ACESS\u00d3RIOS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 187488.92,
+        "faturamento2026": 52792.909999999996,
+        "count": 5
+      },
+      "TOK BOTHANICO": {
+        "totalProdutos": 5,
+        "estoqueVenda": 4049.76,
+        "faturamento2026": 416.15000000000003,
+        "count": 5
+      },
+      "TRICOFORT": {
+        "totalProdutos": 5,
+        "estoqueVenda": 71064.79999999999,
+        "faturamento2026": 20643.190000000002,
+        "count": 5
+      },
+      "VITA SEIVA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 598268.63,
+        "faturamento2026": 287338.46,
+        "count": 5
+      },
+      "WIDI CARE": {
+        "totalProdutos": 5,
+        "estoqueVenda": 67657.98000000001,
+        "faturamento2026": 86509.54000000001,
+        "count": 5
+      },
+      "YAM\u00c1": {
+        "totalProdutos": 5,
+        "estoqueVenda": 1255349.4100000001,
+        "faturamento2026": 541554.01,
+        "count": 5
+      },
+      "ZALIKE ACESSORIOS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 99812.93999999999,
+        "faturamento2026": 74934.03,
+        "count": 5
+      },
+      "SUPLEY": {
+        "totalProdutos": 5,
+        "estoqueVenda": 690229.0700000001,
+        "faturamento2026": 62078.68,
+        "count": 5
+      },
+      "FLORA CAPILAR": {
+        "totalProdutos": 5,
+        "estoqueVenda": 347544.81000000006,
+        "faturamento2026": 390709.65,
+        "count": 5
+      },
+      "FLORA DERME": {
+        "totalProdutos": 5,
+        "estoqueVenda": 219090.52000000002,
+        "faturamento2026": 279058.99,
+        "count": 5
+      },
+      "APICE COSMETICS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 462613.18,
+        "faturamento2026": 376972.5900000001,
+        "count": 5
+      },
+      "PROHALL": {
+        "totalProdutos": 5,
+        "estoqueVenda": 0,
+        "faturamento2026": 0,
+        "count": 5
+      },
+      "SKALA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 912016.25,
+        "faturamento2026": 534376.22,
+        "count": 5
+      },
+      "AK ACESSORIOS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 187.34,
+        "faturamento2026": 6.47,
+        "count": 5
+      },
+      "AMARA BLANC E WELLUX": {
+        "totalProdutos": 5,
+        "estoqueVenda": 9991.739999999998,
+        "faturamento2026": 115.79,
+        "count": 5
+      },
+      "DHALIAS": {
+        "totalProdutos": 5,
+        "estoqueVenda": 2968.1400000000003,
+        "faturamento2026": 130.99,
+        "count": 5
+      },
+      "BRAGA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 389.2,
+        "faturamento2026": 0,
+        "count": 5
+      },
+      "VOLK": {
+        "totalProdutos": 5,
+        "estoqueVenda": 0,
+        "faturamento2026": 0,
+        "count": 5
+      },
+      "EXTRAVASA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 0,
+        "faturamento2026": 0,
+        "count": 5
+      },
+      "FELPS": {
+        "totalProdutos": 10,
+        "estoqueVenda": 451.2000000000001,
+        "faturamento2026": 0,
+        "count": 10
+      },
+      "FINI": {
+        "totalProdutos": 5,
+        "estoqueVenda": 0,
+        "faturamento2026": 0,
+        "count": 5
+      },
+      "FIOVIT": {
+        "totalProdutos": 5,
+        "estoqueVenda": 0,
+        "faturamento2026": 0,
+        "count": 5
+      },
+      "FOLHA NATIVA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 0,
+        "faturamento2026": 0,
+        "count": 5
+      },
+      "FT CONSULTORIA": {
+        "totalProdutos": 5,
+        "estoqueVenda": 753.52,
+        "faturamento2026": 16.27,
+        "count": 5
+      },
+      "HENNFORT": {
+        "totalProdutos": 5,
+        "estoqueVenda": 0,
+        "faturamento2026": 0,
+        "count": 5
+      },
+      "HITZ": {
+        "totalProdutos": 5,
+        "estoqueVenda": 0,
+        "faturamento2026": 0,
+        "count": 5
+      },
+      "LIZAN": {
+        "totalProdutos": 5,
+        "estoqueVenda": 0,
+        "faturamento2026": 0,
+        "count": 5
+      },
+      "TAIFF": {
+        "totalProdutos": 5,
+        "estoqueVenda": 0,
+        "faturamento2026": 0,
+        "count": 5
+      }
+    },
+    "byComprador": {
+      "SAMUEL": {
+        "totalProdutos": 135,
+        "estoqueVenda": 34054189.74,
+        "faturamento2026": 11947372.749999998,
+        "count": 135
+      },
+      "ZILMA": {
+        "totalProdutos": 120,
+        "estoqueVenda": 9322757.479999997,
+        "faturamento2026": 3902859.920000001,
+        "count": 120
+      },
+      "ALICE": {
+        "totalProdutos": 130,
+        "estoqueVenda": 28118414.28999999,
+        "faturamento2026": 12869112.339999998,
+        "count": 130
+      },
+      "GUILHERME": {
+        "totalProdutos": 80,
+        "estoqueVenda": 268229.98,
+        "faturamento2026": 105475.95999999998,
+        "count": 80
+      },
+      "DESCONTINUADO": {
+        "totalProdutos": 85,
+        "estoqueVenda": 14741.14,
+        "faturamento2026": 269.52,
+        "count": 85
+      }
+    }
+  }
+}

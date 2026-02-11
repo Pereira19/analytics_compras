@@ -6,6 +6,7 @@ import Sheet4SupplierBuyer from '@/pages/Sheet4SupplierBuyer';
 import Sheet2SupplierAnalysis from '@/pages/Sheet2SupplierAnalysis';
 import Sheet3BuyerAnalysis from '@/pages/Sheet3BuyerAnalysis';
 import Sheet1ProductAnalysis from '@/pages/Sheet1ProductAnalysis';
+import ConsolidatedDashboard from '@/pages/ConsolidatedDashboard';
 import GlobalPeriodFilter from '@/components/GlobalPeriodFilter';
 
 /**
@@ -17,9 +18,10 @@ import GlobalPeriodFilter from '@/components/GlobalPeriodFilter';
  * - Animações suaves e transições fluidas
  */
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<string>('DASHBOARD EXECUTIVO');
+  const [activeTab, setActiveTab] = useState<string>('CONSOLIDADO');
 
   const tabs = [
+    { id: 'CONSOLIDADO', label: '🎯 Dashboard Consolidado', component: ConsolidatedDashboard },
     { id: 'DASHBOARD EXECUTIVO', label: '📊 Dashboard Executivo', component: ExecutiveDashboard },
     { id: 'FORNECEDORES X COMPRADOR', label: 'Fornecedor × Comprador', component: Sheet4SupplierBuyer },
     { id: 'ANALISE FORNECEDOR', label: 'Análise Fornecedor', component: Sheet2SupplierAnalysis },
